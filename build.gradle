@@ -1,0 +1,40 @@
+plugins {
+    id("java")
+    id("org.jetbrains.intellij") version "1.16.1"
+}
+
+group = "com.example"
+version = "1.0.0"
+
+repositories {
+
+    maven { url 'https://maven.aliyun.com/repository/public/' }
+    maven { url 'https://maven.aliyun.com/repository/gradle-plugin'}
+    maven { url 'https://maven.aliyun.com/repository/central/'}
+    maven { url 'https://maven.aliyun.com/repository/google/' }
+    maven { url 'https://maven.aliyun.com/repository/jcenter/'}
+    maven { url 'https://maven.aliyun.com/repository'}
+}
+
+dependencies {
+    implementation 'org.jetbrains:annotations:20.1.0'
+    implementation 'com.github.vertical-blank:sql-formatter:1.0.1'
+    implementation 'cn.hutool:hutool-all:5.8.13'
+    implementation 'com.intellij:forms_rt:7.0.3'
+    implementation 'org.freemarker:freemarker:2.3.30'
+}
+
+intellij {
+    version = '2024.1'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+    options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation', '-parameters']
+}
+
+patchPluginXml {
+    //注意这个版本号不能高于上面intellij的version,否则runIde会报错
+    sinceBuild = '231'
+    untilBuild = '241.*'
+}
