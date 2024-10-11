@@ -2,6 +2,9 @@ package com.chinaclear.sz.component.generator;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.chinaclear.sz.component.pojo.BuildTemplateParam;
+import com.chinaclear.sz.component.pojo.ModuleEnum;
+import com.chinaclear.sz.component.pojo.ModuleInfo;
 import freemarker.template.*;
 
 import java.io.*;
@@ -32,11 +35,14 @@ public class BuildGradleGenerator implements Generator {
             templateName = "build-param.ftl";
         }else if (StrUtil.equals(buildTemplateInfo.getMenuType(), ModuleEnum.QUERY.getName())) {
             templateName = "build-query.ftl";
+        }else if (StrUtil.equals(buildTemplateInfo.getMenuType(), ModuleEnum.COMPONENT.getName())) {
+            templateName = "build-component.ftl";
         }
+
 
         //拿到build.gradle文件路径
         String buildGradleDirPath = buildTemplateInfo.getBaseRootDir()
-                + File.separator + buildTemplateInfo.getMenuId();
+                + File.separator + buildTemplateInfo.getSubProjectName();
         File targetDir = new File(buildGradleDirPath);
         if (!targetDir.exists()) {
             targetDir.mkdirs();
@@ -51,15 +57,12 @@ public class BuildGradleGenerator implements Generator {
         generator.generate();
     }
 
-
-    public static void main(java.lang.String[] args) {
-    }
-
     @Override
     public boolean isSupport(String type) {
         return ModuleEnum.PROCESS.getName().equals(type)
                 || ModuleEnum.PARAM.getName().equals(type)
-                || ModuleEnum.QUERY.getName().equals(type);
+                || ModuleEnum.QUERY.getName().equals(type)
+                || ModuleEnum.COMPONENT.getName().equals(type);
     }
 
     @Override
@@ -67,8 +70,8 @@ public class BuildGradleGenerator implements Generator {
         if (StrUtil.isBlank(moduleInfo.getVersion())) {
             throw new RuntimeException("version is null");
         }
-        if (StrUtil.isBlank(moduleInfo.getId())) {
-            throw new RuntimeException("menuId is null");
+        if (StrUtil.isBlank(moduleInfo.getSubProjectName())) {
+            throw new RuntimeException("子项目名称为空");
         }
         if (StrUtil.isBlank(moduleInfo.getType())) {
             throw new RuntimeException("menuType is null");
@@ -76,9 +79,10 @@ public class BuildGradleGenerator implements Generator {
 
         BuildTemplateParam buildTemplateInfo = new BuildTemplateParam();
         buildTemplateInfo.setVersion(moduleInfo.getVersion());
-        buildTemplateInfo.setMenuId(moduleInfo.getId());
+        buildTemplateInfo.setSubProjectName(moduleInfo.getSubProjectName());
         buildTemplateInfo.setMenuType(moduleInfo.getType());
         buildTemplateInfo.setBaseRootDir(moduleInfo.getBaseDir());
+        buildTemplateInfo.setConvertId(moduleInfo.getConvertId());
         this.setBuildTemplateInfo(buildTemplateInfo);
 
         this.generate();

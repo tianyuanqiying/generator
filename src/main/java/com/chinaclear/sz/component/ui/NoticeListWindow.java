@@ -4,8 +4,9 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import com.chinaclear.sz.component.config.PropertiesCache;
 import com.chinaclear.sz.component.generator.DirectoryGenerator;
-import com.chinaclear.sz.component.generator.ModuleEnum;
+import com.chinaclear.sz.component.pojo.ModuleEnum;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.wm.ToolWindow;
@@ -15,7 +16,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @author sfhuang
@@ -25,18 +31,24 @@ public class NoticeListWindow {
     private JPanel content;
     private JComboBox<String> selectVer;
 
+    private JPanel versionPanel;
+
     private JComboBox<String> menusType;
-    private JTextField menuId;
+    private JTextField subProjectName;
     private JButton btnGen;
     private JButton btnClear;
     private JButton btnClose;
+    private JTextField convertId;
+    private JPanel convertPanel;
 
+    private JTextField packageName;
 
     private Project project;
     private ToolWindow toolWindow;
 
-    public void init(){
-        menuId.setText("");
+    public void init() {
+        subProjectName.setText("");
+        packageName.setText("");
 
         //四种应用类型
         menusType.addItem("流程");
@@ -45,10 +57,11 @@ public class NoticeListWindow {
         menusType.addItem("组件");
 
         //默认的应用类型为流程类型，因此，版本列表系那是流程框架的版本号列表；
-        List<String> versionList = queryVersionList(ModuleEnum.PROCESS.getName());
+        Collection<String> versionList = queryVersionList(ModuleEnum.PROCESS.getName());
         if (CollUtil.isEmpty(versionList)) {
             versionList = CollUtil.newArrayList("V1.0.0", "V2.0.0", "V3.0.0");
         }
+
         for (String version : versionList) {
             getSelectVer().addItem(version);
         }
@@ -59,74 +72,62 @@ public class NoticeListWindow {
                 generateDirectory();
             }
         });
+
         btnClear.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                menuId.setText("");
+                subProjectName.setText("");
+                packageName.setText("");
+                convertId.setText("");
                 selectVer.setSelectedIndex(0);
                 menusType.setSelectedIndex(0);
             }
         });
-       btnClose.addActionListener(new ActionListener() {
-           @Override
-           public void actionPerformed(ActionEvent e) {
-               toolWindow.hide();
-           }
-       });
-
-        menusType.addItemListener(new ItemListener() {
+        btnClose.addActionListener(new ActionListener() {
             @Override
-            public void itemStateChanged(ItemEvent e) {
-                //选中时出发；
-                if (e.getStateChange() == ItemEvent.SELECTED) {
-                    Object selectedItem = menusType.getSelectedItem();
-                    if (StrUtil.isBlankIfStr(selectedItem)) {
-                        return;
-                    }
-
-                    //获取版本号
-                    List<String> versionList = queryVersionList(selectedItem.toString());
-
-                    //版本号设置给版本号下拉框
-                    for (String version : versionList) {
-                        getMenusType().addItem(version);
-                    }
-                }
+            public void actionPerformed(ActionEvent e) {
+                toolWindow.hide();
             }
         });
+
+        //添加应用类型下拉框监听器
+        menusType.addItemListener(new MenuTypeSelectedListener());
     }
 
     /**
      * 根据不同的应用类型查询不同的依赖框架版本
+     *
      * @param menuType 应用类型
      * @return 版本列表
      */
     private List<String> queryVersionList(String menuType) {
-        try{
+        try {
             //根据应用类型发送不同的URL请求
             StringBuilder queryUrlBuilder = new StringBuilder();
             queryUrlBuilder.append("http://maven.sz.chinaclear.cn/service/rest/v1/search?");
             if (ModuleEnum.PROCESS.getName().equals(menuType)) {
-                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework&&name=bpm-process-spring-boot-starter");
-            }else if (ModuleEnum.PARAM.getName().equals(menuType)) {
-                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework.param&&name=param-maintain-spring-boot-starter");
-            }else if (ModuleEnum.QUERY.getName().equals(menuType)) {
-                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework.query&&name=query-spring-boot-starter");
+                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework&name=bpm-process-spring-boot-starter");
+            } else if (ModuleEnum.PARAM.getName().equals(menuType)) {
+                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework.param&name=param-maintain-spring-boot-starter");
+            } else if (ModuleEnum.QUERY.getName().equals(menuType)) {
+                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework.query&name=query-spring-boot-starter");
             }
 
+            cn.hutool.http.HttpRequest get = HttpUtil.createGet(queryUrlBuilder.toString());
+            //用户身份认证表示
+            get.header("Authorization", PropertiesCache.get("Authorization"));
+
+            String response = get.execute().body();
+
             //发HTTP请求
-            String response = HttpUtil.get(queryUrlBuilder.toString(), 5000);
             Map<String, Object> responseMap = JSONUtil.toBean(response, HashMap.class);
 
             //解析items字段，拿到version列表信息
             List<Map<String, Object>> items = Optional.ofNullable(responseMap.get("items")).map(p -> (List) p).orElse(new ArrayList());
-            if (CollUtil.isEmpty(items)) {
-                return new ArrayList<>();
-            }
             //解析结果，拿到版本列表；
             List<String> versionList = items.stream().map(item -> {
                 String repository = Optional.ofNullable(item.get("repository")).map(repo -> repo.toString()).orElse("");
-                String version = Optional.ofNullable(item.get("version")).map(v -> v.toString()).orElse("");
+                String version = Optional.ofNullable(item.get("version")).map(v -> v.toString()).orElse("").split("-")[0];
                 if (repository.equals("snapshots")) {
                     version = version + "-SNAPSHOT";
                 }
@@ -134,10 +135,10 @@ public class NoticeListWindow {
             }).sorted((v1, v2) -> {
                 String version = v1.split("-")[0];
                 String version2 = v2.split("-")[0];
-                return version.compareTo(version2);
-            }).toList();
+                return version2.compareTo(version);
+            }).limit(5).distinct().toList();
             return versionList;
-        }catch (Exception exception) {
+        } catch (Exception exception) {
             System.out.println("发生异常：" + exception.getMessage());
             return new ArrayList<>();
         }
@@ -150,9 +151,14 @@ public class NoticeListWindow {
     }
 
     private void generateDirectory() {
-        String menuId = this.getMenuId().getText();
-        if (StrUtil.isBlankIfStr(menuId)) {
-            System.out.println("菜单ID不能为空");
+        String subProjectName = this.getSubProjectName().getText();
+        if (StrUtil.isBlankIfStr(subProjectName)) {
+            System.out.println("子项目名称不能为空");
+            return;
+        }
+        String packageName = this.getPackageName().getText();
+        if (StrUtil.isBlankIfStr(packageName)) {
+            System.out.println("包名不能为空");
             return;
         }
 
@@ -162,14 +168,20 @@ public class NoticeListWindow {
             return;
         }
 
-        Object version = this.getSelectVer().getSelectedItem();
-        String menuType = menuTypeSelected.toString();
+        //组件不存在版本号；
+        Object version = Optional.ofNullable(this.getSelectVer().getSelectedItem()).orElse("");
+
+        //组件不存在转换ID
+        String convertId = Optional.ofNullable(this.getConvertId().getText()).orElse("");
+
         //创建目录生成器
         DirectoryGenerator generator = DirectoryGenerator.builder()
-                .id(menuId)
-                .type(menuType)
+                .subProjectName(subProjectName)
+                .type(menuTypeSelected.toString())
                 .baseDir(this.getProject().getBasePath())
                 .version(version.toString())
+                .convertId(convertId)
+                .packageName(packageName)
                 .build();
         generator.generate();
 
@@ -201,12 +213,12 @@ public class NoticeListWindow {
         this.menusType = menusType;
     }
 
-    public JTextField getMenuId() {
-        return menuId;
+    public JTextField getSubProjectName() {
+        return subProjectName;
     }
 
-    public void setMenuId(JTextField menuId) {
-        this.menuId = menuId;
+    public void setSubProjectName(JTextField subProjectName) {
+        this.subProjectName = subProjectName;
     }
 
     public JButton getBtnGen() {
@@ -247,5 +259,119 @@ public class NoticeListWindow {
 
     public void setToolWindow(ToolWindow toolWindow) {
         this.toolWindow = toolWindow;
+    }
+
+    public static Set<String> findVersions(String menuType) {
+
+        //org.freemarker:freemarker:2.3.30
+        String groupId = "";
+        String artifactId = "";
+        if (ModuleEnum.PROCESS.getName().equals(menuType)) {
+            groupId = "org.freemarker";
+            artifactId = "freemarker";
+        } else if (ModuleEnum.PARAM.getName().equals(menuType)) {
+            groupId = "cn.hutool";
+            artifactId = "hutool-all";
+        } else if (ModuleEnum.QUERY.getName().equals(menuType)) {
+            groupId = "org.apache.commons";
+            artifactId = "commons-lang3";
+        }
+
+        try {
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI("https://repo1.maven.org/maven2/" + groupId.replace('.', '/') + "/" + artifactId + "/maven-metadata.xml"))
+                    .build();
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+            // 这里需要解析XML文件来提取版本信息，或者根据实际情况调整URL直接获取JSON格式的数据
+            System.out.println(response.body());
+            Set<String> versions = parseMavenMetadata(response.body(), groupId, artifactId);
+            return versions;
+        } catch (Exception exception) {
+            exception.printStackTrace();
+            return new HashSet<>();
+        }
+    }
+
+    private static Set<String> parseMavenMetadata(String xmlContent, String groupId, String artifactId) {
+        // 简单的字符串解析示例
+        Set<String> versions = new HashSet<>();
+
+        int start = xmlContent.indexOf("<versioning>");
+        int end = xmlContent.indexOf("</versioning>");
+
+        if (start != -1 && end != -1) {
+            String versioningPart = xmlContent.substring(start + "<versioning>".length(), end);
+            int leftIndex = versioningPart.indexOf("<version>");
+            int rightIndex = versioningPart.indexOf("</version>");
+            while (leftIndex != -1 && rightIndex != -1) {
+                String version = versioningPart.substring(leftIndex + "<version>".length(), rightIndex);
+                String versionNumber = version.split("-")[0];
+                versions.add(versionNumber);
+                versioningPart = versioningPart.substring(rightIndex + "</verison>".length());
+                leftIndex = versioningPart.indexOf("<version>");
+                rightIndex = versioningPart.indexOf("</version>");
+            }
+        }
+        return versions;
+    }
+
+    public JTextField getConvertId() {
+        return convertId;
+    }
+
+    public void setConvertId(JTextField convertId) {
+        this.convertId = convertId;
+    }
+
+    public JTextField getPackageName() {
+        return packageName;
+    }
+
+    public void setPackageName(JTextField packageName) {
+        this.packageName = packageName;
+    }
+
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
+
+    public class MenuTypeSelectedListener implements ItemListener {
+        @Override
+        public void itemStateChanged(ItemEvent e) {
+            Object selectedItem = menusType.getSelectedItem();
+            //选择了组件类型，隐藏 打包插件输入框和框架版本下拉框, 否则显示打包插件和框架版本下拉框
+            if (ItemEvent.SELECTED == e.getStateChange() && ModuleEnum.COMPONENT.getName().equals(selectedItem.toString())) {
+                SwingUtilities.invokeLater(() -> {
+                    convertPanel.setVisible(false);
+                    versionPanel.setVisible(false);
+                    // 其他组件的可见性更改
+                });
+                return;
+            }
+
+            //如果menutype下拉框选择了其他类型的应用
+            if (ItemEvent.SELECTED == e.getStateChange()) {
+                //异步设置版本号
+                CompletableFuture.runAsync(() -> {
+                    Collection<String> versions = queryVersionList(selectedItem.toString());
+                    if (CollUtil.isEmpty(versions)) {
+                        versions = CollUtil.newArrayList("V1.0.0", "V2.0.0", "V3.0.0");
+                    }
+
+                    //清空版本号；
+                    getSelectVer().removeAllItems();
+
+                    //版本号设置给版本号下拉框
+                    for (String version : versions) {
+                        getSelectVer().addItem(version);
+                    }
+                });
+
+                convertPanel.setVisible(true);
+                versionPanel.setVisible(true);
+//                Collection<String> versionList = findVersions(selectedItem.toString());
+            }
+        }
     }
 }

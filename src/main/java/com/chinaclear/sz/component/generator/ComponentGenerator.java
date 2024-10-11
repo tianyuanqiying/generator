@@ -1,6 +1,10 @@
 package com.chinaclear.sz.component.generator;
 
 import cn.hutool.core.collection.CollUtil;
+import com.chinaclear.sz.component.config.PathCache;
+import com.chinaclear.sz.component.config.PropertiesCache;
+import com.chinaclear.sz.component.pojo.ModuleEnum;
+import com.chinaclear.sz.component.pojo.ModuleInfo;
 
 import java.io.File;
 import java.util.List;
@@ -13,35 +17,39 @@ public class ComponentGenerator extends AbstractGenerator {
 
     @Override
     public void generate(ModuleInfo moduleInfo) {
-        if (isBlank(moduleInfo.getId())) {
+        if (isBlank(moduleInfo.getSubProjectName())) {
             throw new RuntimeException("id不能为空");
         }
 
         //获取src, main, sz目录
-        java.lang.String srcPath = getSrcPath(moduleInfo);
-        java.lang.String mainPath = getMainPath(moduleInfo);
-        java.lang.String szDirPath = getSzDirPath(moduleInfo);
-
-        //组件父目录
-        java.lang.String componentDirPath = szDirPath
-                + File.separator + "component"
-                + File.separator + moduleInfo.getId();
+//        String srcPath = getSrcPath(moduleInfo);
+//        String mainPath = getMainPath(moduleInfo);
+//        String szDirPath = getSzDirPath(moduleInfo);
+//
+//        //组件父目录
+//        String componentDirPath = szDirPath
+//                + File.separator + "component"
+//                + File.separator + moduleInfo.getSubProjectName();
 
         //===组件公有目录===
-        java.lang.String daotaDirPath = componentDirPath + File.separator + "dao";
-        java.lang.String dtotaDirPath = componentDirPath + File.separator + "dto";
-        java.lang.String modelDirPath = componentDirPath + File.separator + "model";
-        java.lang.String serviceDirPath = componentDirPath + File.separator + "service";
-        java.lang.String temlateDirPath = componentDirPath + File.separator + "template";
-        java.lang.String serviceImplDirPath = serviceDirPath + File.separator + "impl";
+        List<String> componentDirectories = PathCache.getWithPrefix("component");
+        List<String> paths = super.handlePath(componentDirectories, moduleInfo);
+//
+//        String daotaDirPath = componentDirPath + File.separator + "dao";
+//        String dtotaDirPath = componentDirPath + File.separator + "dto";
+//        String modelDirPath = componentDirPath + File.separator + "model";
+//        String serviceDirPath = componentDirPath + File.separator + "service";
+//        String temlateDirPath = componentDirPath + File.separator + "template";
+//        String serviceImplDirPath = serviceDirPath + File.separator + "impl";
+//
+//        String resourceDirPath = mainPath + File.separator + "resources";
+//        String testJavaPath = srcPath + File.separator + "test" + File.separator + "java";
+//
 
-        java.lang.String resourceDirPath = mainPath + File.separator + "resources";
-        java.lang.String testJavaPath = srcPath + File.separator + "test" + File.separator + "java";
-
-        List<java.lang.String> paths = CollUtil.newArrayList(daotaDirPath, dtotaDirPath, modelDirPath, serviceDirPath, temlateDirPath, serviceImplDirPath, resourceDirPath, testJavaPath);
+//        List<String> paths = CollUtil.newArrayList(daotaDirPath, dtotaDirPath, modelDirPath, serviceDirPath, temlateDirPath, serviceImplDirPath, resourceDirPath, testJavaPath);
 
         //创建目录
-        for (java.lang.String path : paths) {
+        for (String path : paths) {
             File file = new File(path);
             if (!file.exists()) {
                 file.mkdirs();

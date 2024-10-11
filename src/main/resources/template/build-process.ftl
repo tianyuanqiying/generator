@@ -1,6 +1,6 @@
 plugins {
     id 'org.springframework.boot'  apply false
-    id 'cn.chinaclear.sz.mixed.app.settlementpath.java-conventions'
+    id '${convertId}'
     id 'cn.chinaclear.sz.tool.devlint' version '1.4.2-SNAPSHOT'
 }
 
@@ -12,4 +12,4 @@ dependencies {
     implementation 'cn.chinaclear.sz.bpmframework:bpm-process-spring-boot-starter:${version}'
 }
 
-description = '${menuId}'
+description = '${subProjectName}'

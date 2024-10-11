@@ -1,6 +1,7 @@
 package com.chinaclear.sz.component.generator;
 
 
+import com.chinaclear.sz.component.pojo.ModuleInfo;
 
 /**
  *

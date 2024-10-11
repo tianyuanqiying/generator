@@ -1,10 +1,13 @@
 package com.chinaclear.sz.component.generator;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.io.FileUtil;
+import com.chinaclear.sz.component.pojo.ModuleInfo;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractGenerator implements Generator{
@@ -14,11 +17,11 @@ public abstract class AbstractGenerator implements Generator{
      * @param moduleInfo 模块名称
      */
     public void updateSettingGradle(ModuleInfo moduleInfo) {
-        if(isBlank(moduleInfo.getName())) {
+        if(isBlank(moduleInfo.getSubProjectName())) {
             return;
         }
 
-        String inclusionInfo = "include '" + moduleInfo.getName() + "'";
+        String inclusionInfo = "include '" + moduleInfo.getSubProjectName() + "'";
 
         File settingsGradle = new File(moduleInfo.getBaseDir() + File.separator + "settings.gradle");
 
@@ -44,42 +47,35 @@ public abstract class AbstractGenerator implements Generator{
         }
     }
 
-    public String getSrcPath(ModuleInfo moduleInfo) {
-        //项目根目录
-        String userDir = moduleInfo.getBaseDir();
-
-        //加上子项目根目录
-        String projectRootDir = isBlank(moduleInfo.getName()) ? userDir : userDir + File.separator + moduleInfo.getName();
-
-        //返回项目的src目录
-        return projectRootDir + File.separator + "src";
-    }
-
-    /**
-     * 获取main目录
-     * @param moduleName 子目录名称
-     * @return main目录
-     */
-    public String getMainPath(ModuleInfo moduleName) {
-        return getSrcPath(moduleName) + File.separator + "main";
-    }
-
-    /**
-     * 获取公共目录sz的路径
-     * @param moduleName 模块名称
-     * @return sz 目录
-     */
-    public String getSzDirPath(ModuleInfo moduleName) {
-        String mainPath = getMainPath(moduleName);
-
-        return mainPath
-                + File.separator + "java"
-                + File.separator + "cn"
-                + File.separator + "chinaclear"
-                + File.separator + "sz";
-    }
-
     public boolean isBlank(String text) {
         return text == null || text.trim().length() == 0;
+    }
+
+    /**
+     * 相对路径处理为绝对路径
+     * @param directories 目录
+     * @param moduleInfo 变量
+     * @return 绝对路径
+     */
+    protected List<String> handlePath(List<String> directories, ModuleInfo moduleInfo) {
+        List<String> realPaths = new ArrayList<>();
+        if (CollUtil.isEmpty(directories)) {
+            return realPaths;
+        }
+
+        for (String directory : directories) {
+            //替换掉替换符 ${packageName};
+            String path = directory.replace("${packageName}", moduleInfo.getPackageName());
+
+            //避免开头配置不清楚，统一加上File.separator
+            if (!path.startsWith(File.separator)) {
+                path = File.separator + path;
+            }
+
+            //目录路径 = 基础目录路径 + 子项目名称 + path
+            String realPath = moduleInfo.getBaseDir() + File.separator + moduleInfo.getSubProjectName() + path;
+            realPaths.add(realPath);
+        }
+        return realPaths;
     }
 }

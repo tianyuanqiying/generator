@@ -38,3 +38,17 @@ patchPluginXml {
     sinceBuild = '231'
     untilBuild = '241.*'
 }
+
+task cacheToMaven(type: Copy) {
+    from new File('E:/gradle-8.4-bin/repo/')
+    into 'E:/gradle-8.4-bin/maven'
+    eachFile {
+        it.path = it.path.replace('\\', '/')
+        List<String> paths = it.path.replace('/')
+        String path = paths[0].replace('.','/')
+        paths.remove(0);
+        paths.remove(paths.size() - 2);
+        path = path + '/' + String.join('/', paths)
+        it.path = path
+    }
+}

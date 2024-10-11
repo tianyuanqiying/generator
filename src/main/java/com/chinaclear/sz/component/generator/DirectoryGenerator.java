@@ -1,5 +1,7 @@
 package com.chinaclear.sz.component.generator;
 
+import com.chinaclear.sz.component.pojo.ModuleInfo;
+
 import java.util.List;
 
 public class DirectoryGenerator {
@@ -26,15 +28,19 @@ public class DirectoryGenerator {
     }
 
     public static class Builder {
-        private String id;
+        private String subProjectName;
         private String name;
         private String type;
 
         private String baseDir;
         private String version;
 
-        public DirectoryGenerator.Builder id(String id) {
-            this.id = id;
+        private String convertId;
+
+        private String packageName;
+
+        public DirectoryGenerator.Builder subProjectName(String subProjectName) {
+            this.subProjectName = subProjectName;
             return this;
         }
 
@@ -52,8 +58,17 @@ public class DirectoryGenerator {
             return this;
         }
 
+        public DirectoryGenerator.Builder convertId(String convertId) {
+            this.convertId = convertId;
+            return this;
+        }
+
+        public DirectoryGenerator.Builder packageName(String packageName) {
+            this.packageName = packageName;
+            return this;
+        }
         public DirectoryGenerator build() {
-            if (id == null) {
+            if (subProjectName == null) {
                 throw new RuntimeException("id 不能为空");
             }
 
@@ -62,11 +77,12 @@ public class DirectoryGenerator {
             }
 
             ModuleInfo moduleInfo = new ModuleInfo();
-            moduleInfo.setId(id);
+            moduleInfo.setSubProjectName(subProjectName);
             moduleInfo.setType(type);
-            moduleInfo.setName(id);
+            moduleInfo.setPackageName(packageName);
             moduleInfo.setBaseDir(baseDir);
             moduleInfo.setVersion(version);
+            moduleInfo.setConvertId(convertId);
             DirectoryGenerator directoryGenerator = new DirectoryGenerator();
             directoryGenerator.setModuleInfo(moduleInfo);
 

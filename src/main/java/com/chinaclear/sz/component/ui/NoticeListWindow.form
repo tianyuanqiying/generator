@@ -4,12 +4,13 @@
     <rowspec value="center:max(d;4px):noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <constraints>
-      <xy x="2" y="4" width="534" height="150"/>
+      <xy x="2" y="4" width="532" height="247"/>
     </constraints>
     <properties>
       <maximumSize width="2147483647" height="100"/>
-      <minimumSize width="200" height="150"/>
-      <preferredSize width="270" height="150"/>
+      <minimumSize width="200" height="240"/>
+      <preferredSize width="270" height="240"/>
+      <requestFocusEnabled value="true"/>
     </properties>
     <border type="none"/>
     <children>
@@ -19,8 +20,9 @@
           <forms top="10" left="5" bottom="0" right="0"/>
         </constraints>
         <properties>
-          <minimumSize width="300" height="133"/>
-          <preferredSize width="532" height="150"/>
+          <minimumSize width="300" height="240"/>
+          <preferredSize width="532" height="240"/>
+          <requestFocusEnabled value="false"/>
         </properties>
         <border type="none"/>
         <children>
@@ -43,10 +45,10 @@
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
-                  <text value="菜单id"/>
+                  <text value="子项目名称"/>
                 </properties>
               </component>
-              <component id="965f9" class="javax.swing.JTextField" binding="menuId">
+              <component id="965f9" class="javax.swing.JTextField" binding="subProjectName">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -56,13 +58,43 @@
               </component>
             </children>
           </grid>
-          <grid id="43770" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="6d980" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <minimumSize width="188" height="40"/>
+              <preferredSize width="188" height="40"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="2d952" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="包名"/>
+                </properties>
+              </component>
+              <component id="a71be" class="javax.swing.JTextField" binding="packageName">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+            </children>
+          </grid>
+          <grid id="33f90" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="2" left="0" bottom="2" right="0"/>
             <constraints>
-              <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <preferred-size width="321" height="25"/>
               </grid>
-              <gridbag weightx="1.0" weighty="1.0"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
               <minimumSize width="230" height="40"/>
@@ -70,7 +102,15 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="bb8e3" class="javax.swing.JLabel">
+              <component id="a4c72" class="javax.swing.JComboBox" binding="menusType">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <model/>
+                </properties>
+              </component>
+              <component id="31222" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -78,21 +118,15 @@
                   <text value="菜单类型"/>
                 </properties>
               </component>
-              <component id="4a373" class="javax.swing.JComboBox" binding="menusType">
-                <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="8" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties/>
-              </component>
             </children>
           </grid>
-          <grid id="942d6" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+          <grid id="29e10" binding="versionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="2" left="0" bottom="2" right="0"/>
             <constraints>
-              <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <preferred-size width="321" height="34"/>
               </grid>
-              <gridbag weightx="1.0" weighty="1.0"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
               <minimumSize width="176" height="40"/>
@@ -100,7 +134,7 @@
             </properties>
             <border type="none"/>
             <children>
-              <component id="7eb2c" class="javax.swing.JLabel">
+              <component id="a2330" class="javax.swing.JLabel">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -108,7 +142,7 @@
                   <text value="选择框架版本"/>
                 </properties>
               </component>
-              <component id="6e5cc" class="javax.swing.JComboBox" binding="selectVer">
+              <component id="ef870" class="javax.swing.JComboBox" binding="selectVer">
                 <constraints>
                   <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
                 </constraints>
@@ -118,9 +152,39 @@
               </component>
             </children>
           </grid>
-          <grid id="fb742" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+          <grid id="a1679" binding="convertPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="2" left="0" bottom="2" right="0"/>
             <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <gridbag weightx="0.0" weighty="0.0"/>
+            </constraints>
+            <properties>
+              <minimumSize width="212" height="40"/>
+              <preferredSize width="212" height="40"/>
+            </properties>
+            <border type="none"/>
+            <children>
+              <component id="61e74" class="javax.swing.JLabel">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <text value="打包插件"/>
+                </properties>
+              </component>
+              <component id="9fa3f" class="javax.swing.JTextField" binding="convertId">
+                <constraints>
+                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties/>
+              </component>
+            </children>
+          </grid>
+          <grid id="66251" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
+            <constraints>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <preferred-size width="321" height="40"/>
               </grid>
               <gridbag weightx="1.0" weighty="1.0"/>
@@ -128,19 +192,19 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="eec37" class="javax.swing.JButton" binding="btnGen">
+              <component id="f5815" class="javax.swing.JButton" binding="btnGen">
                 <constraints/>
                 <properties>
                   <text value="生成目录"/>
                 </properties>
               </component>
-              <component id="b1ec5" class="javax.swing.JButton" binding="btnClear">
+              <component id="39f3" class="javax.swing.JButton" binding="btnClear">
                 <constraints/>
                 <properties>
                   <text value="清空内容"/>
                 </properties>
               </component>
-              <component id="8a793" class="javax.swing.JButton" binding="btnClose">
+              <component id="92c17" class="javax.swing.JButton" binding="btnClose">
                 <constraints/>
                 <properties>
                   <text value="退出"/>
@@ -152,15 +216,4 @@
       </grid>
     </children>
   </grid>
-  <buttonGroups>
-    <group name="menusType">
-      <member id="682cc"/>
-      <member id="99014"/>
-      <member id="60d83"/>
-      <member id="5a08"/>
-      <member id="1399a"/>
-      <member id="6ad61"/>
-      <member id="3d0e6"/>
-    </group>
-  </buttonGroups>
 </form>

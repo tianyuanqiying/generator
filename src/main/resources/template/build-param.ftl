@@ -1,6 +1,6 @@
 plugins {
     id 'org.springframework.boot'  apply false
-    id 'cn.chinaclear.sz.mixed.app.settlementpath.java-conventions'
+    id '${convertId}'
     id 'cn.chinaclear.sz.tool.devlint' version '1.4.2-SNAPSHOT'
 }
 
@@ -13,4 +13,4 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
 }
 
-description = '${menuId}'
+description = '${subProjectName}'
