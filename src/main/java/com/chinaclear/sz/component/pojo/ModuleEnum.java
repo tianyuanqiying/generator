@@ -5,15 +5,15 @@ public enum ModuleEnum {
     PARAM("参维", 2),
     QUERY("查询", 3),
     COMPONENT("组件", 4);
-    final java.lang.String name;
+    final String name;
     final Integer type;
 
-    ModuleEnum(java.lang.String name, Integer type) {
+    ModuleEnum(String name, Integer type) {
         this.name = name;
         this.type = type;
     }
 
-    public java.lang.String getName() {
+    public String getName() {
         return name;
     }
 

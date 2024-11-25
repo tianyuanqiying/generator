@@ -4,7 +4,8 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
-import com.chinaclear.sz.component.config.PropertiesCache;
+import com.chinaclear.sz.component.pojo.CacheKey;
+import com.chinaclear.sz.component.config.SingleCacheRegistry;
 import com.chinaclear.sz.component.generator.DirectoryGenerator;
 import com.chinaclear.sz.component.pojo.ModuleEnum;
 import com.intellij.openapi.project.Project;
@@ -42,6 +43,11 @@ public class NoticeListWindow {
     private JPanel convertPanel;
 
     private JTextField packageName;
+    private JTextField authorField;
+    private JTextField componentNameEnField;
+    private JPanel componentNameEnPanel;
+    private JTextField componentNameCnField;
+    private JPanel componentNameCnPanel;
 
     private Project project;
     private ToolWindow toolWindow;
@@ -49,7 +55,9 @@ public class NoticeListWindow {
     public void init() {
         subProjectName.setText("");
         packageName.setText("");
-
+        authorField.setText("");
+        componentNameEnPanel.setVisible(false);
+        componentNameCnPanel.setVisible(false);
         //四种应用类型
         menusType.addItem("流程");
         menusType.addItem("参维");
@@ -79,6 +87,8 @@ public class NoticeListWindow {
                 subProjectName.setText("");
                 packageName.setText("");
                 convertId.setText("");
+                authorField.setText("");
+                componentNameEnField.setText("");
                 selectVer.setSelectedIndex(0);
                 menusType.setSelectedIndex(0);
             }
@@ -115,7 +125,7 @@ public class NoticeListWindow {
 
             cn.hutool.http.HttpRequest get = HttpUtil.createGet(queryUrlBuilder.toString());
             //用户身份认证表示
-            get.header("Authorization", PropertiesCache.get("Authorization"));
+            get.header("Authorization", getAuthorization());
 
             String response = get.execute().body();
 
@@ -144,6 +154,26 @@ public class NoticeListWindow {
         }
     }
 
+    private String getAuthorization() {
+        //先从环境变量获取 maven库的身份信息
+        String authorization = System.getenv("Authorization");
+        if (StrUtil.isNotBlank(authorization)) {
+            return authorization;
+        }
+
+        //环境变量没有，则从path.properties文件里获取。
+        authorization = SingleCacheRegistry.getCache(CacheKey.CONFIG).get("Authorization");
+        return authorization;
+    }
+
+    public JTextField getAuthorField() {
+        return authorField;
+    }
+
+    public void setAuthorField(JTextField authorField) {
+        this.authorField = authorField;
+    }
+
     public NoticeListWindow(Project project, final ToolWindow toolWindow) {
         this.project = project;
         this.toolWindow = toolWindow;
@@ -153,18 +183,24 @@ public class NoticeListWindow {
     private void generateDirectory() {
         String subProjectName = this.getSubProjectName().getText();
         if (StrUtil.isBlankIfStr(subProjectName)) {
-            System.out.println("子项目名称不能为空");
+            Messages.showErrorDialog("子项目名称不能为空", "错误提示");
             return;
         }
         String packageName = this.getPackageName().getText();
         if (StrUtil.isBlankIfStr(packageName)) {
-            System.out.println("包名不能为空");
+            Messages.showErrorDialog("包名不能为空", "错误提示");
             return;
         }
 
         Object menuTypeSelected = this.getMenusType().getSelectedItem();
         if (Objects.isNull(menuTypeSelected)) {
-            System.out.println("菜单类型不能为空");
+            Messages.showErrorDialog("菜单类型不能为空", "错误提示");
+            return;
+        }
+
+        String authorName = this.getAuthorField().getText();
+        if (StrUtil.isBlank(authorName)) {
+            Messages.showErrorDialog("开发人员的OA名称不能为空", "错误提示");
             return;
         }
 
@@ -174,6 +210,8 @@ public class NoticeListWindow {
         //组件不存在转换ID
         String convertId = Optional.ofNullable(this.getConvertId().getText()).orElse("");
 
+        String componentName = Optional.ofNullable(componentNameEnField.getText()).orElse("");
+        String componentCnName = Optional.ofNullable(componentNameCnField.getText()).orElse("");
         //创建目录生成器
         DirectoryGenerator generator = DirectoryGenerator.builder()
                 .subProjectName(subProjectName)
@@ -182,6 +220,9 @@ public class NoticeListWindow {
                 .version(version.toString())
                 .convertId(convertId)
                 .packageName(packageName)
+                .authorName(authorName)
+                .componentName(componentName)
+                .componentCnName(componentCnName)
                 .build();
         generator.generate();
 
@@ -345,7 +386,8 @@ public class NoticeListWindow {
                 SwingUtilities.invokeLater(() -> {
                     convertPanel.setVisible(false);
                     versionPanel.setVisible(false);
-                    // 其他组件的可见性更改
+                    componentNameEnPanel.setVisible(true);
+                    componentNameCnPanel.setVisible(true);
                 });
                 return;
             }
@@ -367,9 +409,11 @@ public class NoticeListWindow {
                         getSelectVer().addItem(version);
                     }
                 });
-
+                //显示 版本号下拉框， 打包插件输入框， 不显示类名前缀输入框。
                 convertPanel.setVisible(true);
                 versionPanel.setVisible(true);
+                componentNameEnPanel.setVisible(false);
+                componentNameCnPanel.setVisible(false);
 //                Collection<String> versionList = findVersions(selectedItem.toString());
             }
         }

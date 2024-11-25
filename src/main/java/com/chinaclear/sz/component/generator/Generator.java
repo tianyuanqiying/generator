@@ -19,4 +19,6 @@ public interface Generator {
      * @param moduleInfo
      */
     void generate(ModuleInfo moduleInfo);
+
+
 }

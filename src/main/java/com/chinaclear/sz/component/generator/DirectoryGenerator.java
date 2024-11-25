@@ -1,6 +1,7 @@
 package com.chinaclear.sz.component.generator;
 
 import com.chinaclear.sz.component.pojo.ModuleInfo;
+import com.chinaclear.sz.component.util.GeneratorUtil;
 
 import java.util.List;
 
@@ -34,45 +35,61 @@ public class DirectoryGenerator {
 
         private String baseDir;
         private String version;
-
         private String convertId;
-
         private String packageName;
+        private String authorName;
 
-        public DirectoryGenerator.Builder subProjectName(String subProjectName) {
+        private String componentName;
+
+        private String componentCnName;
+        public Builder subProjectName(String subProjectName) {
             this.subProjectName = subProjectName;
             return this;
         }
 
-        public DirectoryGenerator.Builder type(String type) {
+        public Builder type(String type) {
             this.type = type;
             return this;
         }
 
-        public DirectoryGenerator.Builder baseDir(String baseDir) {
+        public Builder baseDir(String baseDir) {
             this.baseDir = baseDir;
             return this;
         }
-        public DirectoryGenerator.Builder version(String version) {
+        public Builder version(String version) {
             this.version = version;
             return this;
         }
 
-        public DirectoryGenerator.Builder convertId(String convertId) {
+        public Builder convertId(String convertId) {
             this.convertId = convertId;
             return this;
         }
 
-        public DirectoryGenerator.Builder packageName(String packageName) {
+        public Builder packageName(String packageName) {
             this.packageName = packageName;
+            return this;
+        }
+        public Builder authorName(String authorName) {
+            this.authorName = authorName;
+            return this;
+        }
+        public Builder componentName(String componentName) {
+            this.componentName = componentName;
+            return this;
+        }
+        public Builder componentCnName(String componentCnName) {
+            this.componentCnName = componentCnName;
             return this;
         }
         public DirectoryGenerator build() {
             if (subProjectName == null) {
-                throw new RuntimeException("id 不能为空");
+                GeneratorUtil.showErrorMessage("子项目不能为空");
+                throw new RuntimeException("子项目不能为空");
             }
 
             if (type == null) {
+                GeneratorUtil.showErrorMessage("应用类型不能为空");
                 throw new RuntimeException("应用类型不能为空");
             }
 
@@ -83,6 +100,9 @@ public class DirectoryGenerator {
             moduleInfo.setBaseDir(baseDir);
             moduleInfo.setVersion(version);
             moduleInfo.setConvertId(convertId);
+            moduleInfo.setAuthorName(authorName);
+            moduleInfo.setComponentName(componentName);
+            moduleInfo.setComponentCnName(componentCnName);
             DirectoryGenerator directoryGenerator = new DirectoryGenerator();
             directoryGenerator.setModuleInfo(moduleInfo);
 

@@ -16,8 +16,12 @@ public class GeneratorFactory {
         generators.add(new ProcessGenerator());
         //添加组件目录生成器
         generators.add(new ComponentGenerator());
-
+        //build.gradle文件生成器
         generators.add(new BuildGradleGenerator());
+        //文档目录生成器
+        generators.add(new DocumentGenerator());
+        //组件代码生成器
+        generators.add(new ComponentFileGenerator());
     }
 
     public static List<Generator> getGenerators() {

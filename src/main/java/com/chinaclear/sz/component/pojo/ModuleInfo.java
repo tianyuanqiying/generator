@@ -11,6 +11,28 @@ public class ModuleInfo {
 
     private String convertId;
 
+    private String authorName;
+
+    private String componentName;
+
+    private String componentCnName;
+
+    public String getComponentCnName() {
+        return componentCnName;
+    }
+
+    public void setComponentCnName(String componentCnName) {
+        this.componentCnName = componentCnName;
+    }
+
+    public String getComponentName() {
+        return componentName;
+    }
+
+    public void setComponentName(String componentName) {
+        this.componentName = componentName;
+    }
+
     public String getSubProjectName() {
         return subProjectName;
     }
@@ -59,5 +81,11 @@ public class ModuleInfo {
         this.convertId = convertId;
     }
 
+    public String getAuthorName() {
+        return authorName;
+    }
 
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
 }

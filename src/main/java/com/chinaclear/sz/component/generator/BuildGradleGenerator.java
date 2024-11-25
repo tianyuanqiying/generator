@@ -2,47 +2,25 @@ package com.chinaclear.sz.component.generator;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.util.StrUtil;
+import com.chinaclear.sz.component.common.AbstractReplaceProcess;
 import com.chinaclear.sz.component.pojo.BuildTemplateParam;
 import com.chinaclear.sz.component.pojo.ModuleEnum;
 import com.chinaclear.sz.component.pojo.ModuleInfo;
-import freemarker.template.*;
+import com.chinaclear.sz.component.util.GeneratorUtil;
 
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * build.gradle的生成器，支持process, query, param应用类型
  */
-public class BuildGradleGenerator implements Generator {
-    private BuildTemplateParam buildTemplateInfo;
-
-    public void setBuildTemplateInfo(BuildTemplateParam buildTemplateInfo) {
-        this.buildTemplateInfo = buildTemplateInfo;
-    }
-
-    public void generate() {
-        if (Objects.isNull(buildTemplateInfo)) {
-            return;
-        }
-
-        //根据应用类型拿到业务模板
-        String templateName = "";
-        if (StrUtil.equals(buildTemplateInfo.getMenuType(), ModuleEnum.PROCESS.getName())) {
-            templateName = "build-process.ftl";
-        }else if (StrUtil.equals(buildTemplateInfo.getMenuType(), ModuleEnum.PARAM.getName())) {
-            templateName = "build-param.ftl";
-        }else if (StrUtil.equals(buildTemplateInfo.getMenuType(), ModuleEnum.QUERY.getName())) {
-            templateName = "build-query.ftl";
-        }else if (StrUtil.equals(buildTemplateInfo.getMenuType(), ModuleEnum.COMPONENT.getName())) {
-            templateName = "build-component.ftl";
-        }
-
-
+public class BuildGradleGenerator extends AbstractReplaceProcess implements Generator {
+    @Override
+    protected File getTargetFile(BuildTemplateParam param) {
         //拿到build.gradle文件路径
-        String buildGradleDirPath = buildTemplateInfo.getBaseRootDir()
-                + File.separator + buildTemplateInfo.getSubProjectName();
+        String buildGradleDirPath = param.getBaseRootDir()
+                + File.separator + param.getSubProjectName();
         File targetDir = new File(buildGradleDirPath);
         if (!targetDir.exists()) {
             targetDir.mkdirs();
@@ -50,11 +28,29 @@ public class BuildGradleGenerator implements Generator {
         String buildGradleFilePath = buildGradleDirPath + File.separator + "build.gradle";
         File targetFile = new File(buildGradleFilePath);
 
-        HashMap<String, Object> ftlParam = BeanUtil.toBean(buildTemplateInfo, HashMap.class);
+        return targetFile;
+    }
 
-        //创建模板替换符生成器， 替换模板变量，数据写入targetFile文件
-        TemplateGenerator generator = new TemplateGenerator(templateName, ftlParam, targetFile);
-        generator.generate();
+    @Override
+    protected Map<String, Object> getTemplateParam(BuildTemplateParam param) {
+        HashMap<String, Object> ftlParam = BeanUtil.toBean(param, HashMap.class);
+        return ftlParam;
+    }
+
+    @Override
+    protected String getTemplateName(BuildTemplateParam param) {
+        //根据应用类型拿到业务模板
+        String templateName = "";
+        if (StrUtil.equals(param.getMenuType(), ModuleEnum.PROCESS.getName())) {
+            templateName = "build-process.ftl";
+        }else if (StrUtil.equals(param.getMenuType(), ModuleEnum.PARAM.getName())) {
+            templateName = "build-param.ftl";
+        }else if (StrUtil.equals(param.getMenuType(), ModuleEnum.QUERY.getName())) {
+            templateName = "build-query.ftl";
+        }else if (StrUtil.equals(param.getMenuType(), ModuleEnum.COMPONENT.getName())) {
+            templateName = "build-component.ftl";
+        }
+        return templateName;
     }
 
     @Override
@@ -68,13 +64,16 @@ public class BuildGradleGenerator implements Generator {
     @Override
     public void generate(ModuleInfo moduleInfo) {
         if (StrUtil.isBlank(moduleInfo.getVersion())) {
-            throw new RuntimeException("version is null");
+            GeneratorUtil.showErrorMessage("版本号不能为空");
+            return;
         }
         if (StrUtil.isBlank(moduleInfo.getSubProjectName())) {
-            throw new RuntimeException("子项目名称为空");
+            GeneratorUtil.showErrorMessage("子项目名称为空");
+            return;
         }
         if (StrUtil.isBlank(moduleInfo.getType())) {
-            throw new RuntimeException("menuType is null");
+            GeneratorUtil.showErrorMessage("菜单类型不能为空");
+            return;
         }
 
         BuildTemplateParam buildTemplateInfo = new BuildTemplateParam();
@@ -83,46 +82,10 @@ public class BuildGradleGenerator implements Generator {
         buildTemplateInfo.setMenuType(moduleInfo.getType());
         buildTemplateInfo.setBaseRootDir(moduleInfo.getBaseDir());
         buildTemplateInfo.setConvertId(moduleInfo.getConvertId());
-        this.setBuildTemplateInfo(buildTemplateInfo);
+        this.setParam(buildTemplateInfo);
 
-        this.generate();
+        //执行模板替换流程，生成build.gradle文件
+        this.templateReplace();
     }
 
-    private static class TemplateGenerator {
-        private java.lang.String templateName;
-
-        private Map<java.lang.String, Object> buildTemplateParam;
-
-        private File targetFile;
-
-        public TemplateGenerator(java.lang.String templateName,
-                                 Map<java.lang.String, Object> buildTemplateParam,
-                                 File targetFile) {
-            this.templateName = templateName;
-            this.buildTemplateParam = buildTemplateParam;
-            this.targetFile = targetFile;
-        }
-
-        public void generate() {
-            Configuration cfg = new Configuration(Configuration.VERSION_2_3_30);
-            try {
-                //设置模板目录
-                cfg.setClassForTemplateLoading(BuildGradleGenerator.class, "/template");
-
-                // 加载模板
-                Template template = cfg.getTemplate(templateName);
-
-                // 输出流，写入目标文件
-                FileWriter fileWriter = new FileWriter(targetFile);
-
-                //合并数据模型与模板， 替换模板参数
-                template.process(buildTemplateParam, fileWriter);
-
-                // 关闭输出流
-                fileWriter.close();
-            }  catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 }

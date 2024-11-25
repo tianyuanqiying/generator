@@ -9,7 +9,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Properties;
 
-public class PropertiesReader {
+
+public final class PropertiesReader {
 
     public static Map<String, String> readConfig(String filePath) {
         Map<String, String> map = new HashMap<>();
