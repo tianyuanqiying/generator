@@ -33,4 +33,15 @@ public abstract class AbstractCache implements ICache {
         }
         return list;
     }
+
+    @Override
+    public List<String> getKeyWithPrefix(String prefix) {
+        List<String> list = new ArrayList<>();
+        for (String key : getCacheMap().keySet()) {
+            if (key.startsWith(prefix)) {
+                list.add(key);
+            }
+        }
+        return list;
+    }
 }

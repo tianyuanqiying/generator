@@ -49,8 +49,10 @@ public class CommonReplaceProcess extends AbstractReplaceProcess {
     }
 
     public static void main(String[] args) {
-        File file = new File("src/main/resources/template/comp/data.sql");
-        File file1 = new File("data.sql");
-        FileUtil.copy(file, file1, true);
+        CommonReplaceProcess commonReplaceProcess = new CommonReplaceProcess();
+        commonReplaceProcess.setParam(new BuildTemplateParam());
+        commonReplaceProcess.setTemplateName("/comp/application_properties.ftl");
+        commonReplaceProcess.setTargetPath("application_properties");
+        commonReplaceProcess.templateReplace();
     }
 }

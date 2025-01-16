@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
+import com.chinaclear.sz.component.common.GeneratorConstant;
 import com.chinaclear.sz.component.pojo.CacheKey;
 import com.chinaclear.sz.component.config.SingleCacheRegistry;
 import com.chinaclear.sz.component.generator.DirectoryGenerator;
@@ -30,10 +31,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public class NoticeListWindow {
     private JPanel content;
-    private JComboBox<String> selectVer;
-
-    private JPanel versionPanel;
-
     private JComboBox<String> menusType;
     private JTextField subProjectName;
     private JButton btnGen;
@@ -41,7 +38,6 @@ public class NoticeListWindow {
     private JButton btnClose;
     private JTextField convertId;
     private JPanel convertPanel;
-
     private JTextField packageName;
     private JTextField authorField;
     private JTextField componentNameEnField;
@@ -64,16 +60,6 @@ public class NoticeListWindow {
         menusType.addItem("查询");
         menusType.addItem("组件");
 
-        //默认的应用类型为流程类型，因此，版本列表系那是流程框架的版本号列表；
-        Collection<String> versionList = queryVersionList(ModuleEnum.PROCESS.getName());
-        if (CollUtil.isEmpty(versionList)) {
-            versionList = CollUtil.newArrayList("V1.0.0", "V2.0.0", "V3.0.0");
-        }
-
-        for (String version : versionList) {
-            getSelectVer().addItem(version);
-        }
-
         btnGen.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -89,7 +75,6 @@ public class NoticeListWindow {
                 convertId.setText("");
                 authorField.setText("");
                 componentNameEnField.setText("");
-                selectVer.setSelectedIndex(0);
                 menusType.setSelectedIndex(0);
             }
         });
@@ -156,13 +141,13 @@ public class NoticeListWindow {
 
     private String getAuthorization() {
         //先从环境变量获取 maven库的身份信息
-        String authorization = System.getenv("Authorization");
+        String authorization = System.getenv(GeneratorConstant.AUTHORIZATION);
         if (StrUtil.isNotBlank(authorization)) {
             return authorization;
         }
 
         //环境变量没有，则从path.properties文件里获取。
-        authorization = SingleCacheRegistry.getCache(CacheKey.CONFIG).get("Authorization");
+        authorization = SingleCacheRegistry.getCache(CacheKey.CONFIG).get(GeneratorConstant.AUTHORIZATION);
         return authorization;
     }
 
@@ -204,8 +189,6 @@ public class NoticeListWindow {
             return;
         }
 
-        //组件不存在版本号；
-        Object version = Optional.ofNullable(this.getSelectVer().getSelectedItem()).orElse("");
 
         //组件不存在转换ID
         String convertId = Optional.ofNullable(this.getConvertId().getText()).orElse("");
@@ -217,7 +200,7 @@ public class NoticeListWindow {
                 .subProjectName(subProjectName)
                 .type(menuTypeSelected.toString())
                 .baseDir(this.getProject().getBasePath())
-                .version(version.toString())
+                .version("")
                 .convertId(convertId)
                 .packageName(packageName)
                 .authorName(authorName)
@@ -236,14 +219,6 @@ public class NoticeListWindow {
 
     public void setContent(JPanel content) {
         this.content = content;
-    }
-
-    public JComboBox<String> getSelectVer() {
-        return selectVer;
-    }
-
-    public void setSelectVer(JComboBox<String> selectVer) {
-        this.selectVer = selectVer;
     }
 
     public JComboBox<String> getMenusType() {
@@ -302,61 +277,6 @@ public class NoticeListWindow {
         this.toolWindow = toolWindow;
     }
 
-    public static Set<String> findVersions(String menuType) {
-
-        //org.freemarker:freemarker:2.3.30
-        String groupId = "";
-        String artifactId = "";
-        if (ModuleEnum.PROCESS.getName().equals(menuType)) {
-            groupId = "org.freemarker";
-            artifactId = "freemarker";
-        } else if (ModuleEnum.PARAM.getName().equals(menuType)) {
-            groupId = "cn.hutool";
-            artifactId = "hutool-all";
-        } else if (ModuleEnum.QUERY.getName().equals(menuType)) {
-            groupId = "org.apache.commons";
-            artifactId = "commons-lang3";
-        }
-
-        try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(new URI("https://repo1.maven.org/maven2/" + groupId.replace('.', '/') + "/" + artifactId + "/maven-metadata.xml"))
-                    .build();
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            // 这里需要解析XML文件来提取版本信息，或者根据实际情况调整URL直接获取JSON格式的数据
-            System.out.println(response.body());
-            Set<String> versions = parseMavenMetadata(response.body(), groupId, artifactId);
-            return versions;
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            return new HashSet<>();
-        }
-    }
-
-    private static Set<String> parseMavenMetadata(String xmlContent, String groupId, String artifactId) {
-        // 简单的字符串解析示例
-        Set<String> versions = new HashSet<>();
-
-        int start = xmlContent.indexOf("<versioning>");
-        int end = xmlContent.indexOf("</versioning>");
-
-        if (start != -1 && end != -1) {
-            String versioningPart = xmlContent.substring(start + "<versioning>".length(), end);
-            int leftIndex = versioningPart.indexOf("<version>");
-            int rightIndex = versioningPart.indexOf("</version>");
-            while (leftIndex != -1 && rightIndex != -1) {
-                String version = versioningPart.substring(leftIndex + "<version>".length(), rightIndex);
-                String versionNumber = version.split("-")[0];
-                versions.add(versionNumber);
-                versioningPart = versioningPart.substring(rightIndex + "</verison>".length());
-                leftIndex = versioningPart.indexOf("<version>");
-                rightIndex = versioningPart.indexOf("</version>");
-            }
-        }
-        return versions;
-    }
-
     public JTextField getConvertId() {
         return convertId;
     }
@@ -382,39 +302,25 @@ public class NoticeListWindow {
         public void itemStateChanged(ItemEvent e) {
             Object selectedItem = menusType.getSelectedItem();
             //选择了组件类型，隐藏 打包插件输入框和框架版本下拉框, 否则显示打包插件和框架版本下拉框
-            if (ItemEvent.SELECTED == e.getStateChange() && ModuleEnum.COMPONENT.getName().equals(selectedItem.toString())) {
-                SwingUtilities.invokeLater(() -> {
-                    convertPanel.setVisible(false);
-                    versionPanel.setVisible(false);
-                    componentNameEnPanel.setVisible(true);
-                    componentNameCnPanel.setVisible(true);
-                });
+            if (ItemEvent.SELECTED == e.getStateChange()
+            && (ModuleEnum.COMPONENT.getName().equals(selectedItem.toString())
+               || ModuleEnum.PARAM.getName().equals(selectedItem.toString()))
+            ) {
+                componentNameEnPanel.setVisible(true);
+                componentNameCnPanel.setVisible(true);
+                convertPanel.setVisible(false);
+                if (ModuleEnum.PARAM.getName().equals(selectedItem.toString())) {
+                    convertPanel.setVisible(true);
+                }
                 return;
             }
 
             //如果menutype下拉框选择了其他类型的应用
             if (ItemEvent.SELECTED == e.getStateChange()) {
-                //异步设置版本号
-                CompletableFuture.runAsync(() -> {
-                    Collection<String> versions = queryVersionList(selectedItem.toString());
-                    if (CollUtil.isEmpty(versions)) {
-                        versions = CollUtil.newArrayList("V1.0.0", "V2.0.0", "V3.0.0");
-                    }
-
-                    //清空版本号；
-                    getSelectVer().removeAllItems();
-
-                    //版本号设置给版本号下拉框
-                    for (String version : versions) {
-                        getSelectVer().addItem(version);
-                    }
-                });
                 //显示 版本号下拉框， 打包插件输入框， 不显示类名前缀输入框。
                 convertPanel.setVisible(true);
-                versionPanel.setVisible(true);
                 componentNameEnPanel.setVisible(false);
                 componentNameCnPanel.setVisible(false);
-//                Collection<String> versionList = findVersions(selectedItem.toString());
             }
         }
     }

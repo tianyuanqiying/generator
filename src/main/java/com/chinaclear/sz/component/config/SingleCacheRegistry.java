@@ -3,6 +3,8 @@ package com.chinaclear.sz.component.config;
 import com.chinaclear.sz.component.common.ICache;
 import com.chinaclear.sz.component.pojo.CacheKey;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,17 +19,16 @@ public class SingleCacheRegistry {
     }
 
     private static void initCache() {
-        PathCache pathCache = new PathCache();
-        pathCache.readCache();
-        cacheMap.put(CacheKey.PATH.getKey(), pathCache);
-
-        ConfigCache configCache = new ConfigCache();
-        configCache.readCache();
-        cacheMap.put(CacheKey.CONFIG.getKey(), configCache);
-
-        FilePathCache filePathCache = new FilePathCache();
-        filePathCache.readCache();
-        cacheMap.put(CacheKey.FILE_PATH.getKey(), filePathCache);
+        for (CacheKey value : CacheKey.values()) {
+            try {
+                Constructor constructor = value.getCacheClazz().getConstructor();
+                ICache instance = (ICache) constructor.newInstance();
+                instance.readCache();
+                cacheMap.put(value.getKey(), instance);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
     /**

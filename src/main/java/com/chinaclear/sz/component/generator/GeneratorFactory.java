@@ -22,6 +22,8 @@ public class GeneratorFactory {
         generators.add(new DocumentGenerator());
         //组件代码生成器
         generators.add(new ComponentFileGenerator());
+        //参维应用初始代码生成器
+        generators.add(new ParamFileGenerator());
     }
 
     public static List<Generator> getGenerators() {

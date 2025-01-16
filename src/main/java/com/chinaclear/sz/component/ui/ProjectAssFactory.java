@@ -15,7 +15,6 @@ import org.jetbrains.annotations.NotNull;
 public class ProjectAssFactory implements ToolWindowFactory {
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-//        NoticeListWindow window = new NoticeListWindow(project, toolWindow);
         NoticeListWindow window = new NoticeListWindow(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(window.getContent(), "", false);

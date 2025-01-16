@@ -4,13 +4,13 @@
     <rowspec value="center:max(d;4px):noGrow"/>
     <colspec value="fill:max(d;4px):noGrow"/>
     <constraints>
-      <xy x="2" y="4" width="532" height="400"/>
+      <xy x="2" y="4" width="532" height="363"/>
     </constraints>
     <properties>
       <maximumSize width="2147483647" height="100"/>
-      <minimumSize width="200" height="400"/>
-      <preferredSize width="270" height="400"/>
-      <requestFocusEnabled value="true"/>
+      <minimumSize width="200" height="360"/>
+      <preferredSize width="270" height="360"/>
+      <requestFocusEnabled value="false"/>
     </properties>
     <border type="none"/>
     <children>
@@ -20,10 +20,10 @@
           <forms top="10" left="5" bottom="0" right="0"/>
         </constraints>
         <properties>
-          <minimumSize width="300" height="400"/>
+          <minimumSize width="300" height="360"/>
           <opaque value="false"/>
-          <preferredSize width="532" height="400"/>
-          <requestFocusEnabled value="false"/>
+          <preferredSize width="532" height="360"/>
+          <requestFocusEnabled value="true"/>
         </properties>
         <border type="none"/>
         <children>
@@ -121,42 +121,10 @@
               </component>
             </children>
           </grid>
-          <grid id="29e10" binding="versionPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
-            <margin top="2" left="0" bottom="2" right="0"/>
-            <constraints>
-              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
-                <preferred-size width="321" height="34"/>
-              </grid>
-              <gridbag weightx="0.0" weighty="0.0"/>
-            </constraints>
-            <properties>
-              <minimumSize width="176" height="40"/>
-              <preferredSize width="176" height="40"/>
-            </properties>
-            <border type="none"/>
-            <children>
-              <component id="a2330" class="javax.swing.JLabel">
-                <constraints>
-                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <text value="选择框架版本"/>
-                </properties>
-              </component>
-              <component id="ef870" class="javax.swing.JComboBox" binding="selectVer">
-                <constraints>
-                  <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="2" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
-                </constraints>
-                <properties>
-                  <model/>
-                </properties>
-              </component>
-            </children>
-          </grid>
           <grid id="a1679" binding="convertPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="2" left="0" bottom="2" right="0"/>
             <constraints>
-              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
@@ -186,7 +154,7 @@
           <grid id="66251" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+              <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
                 <preferred-size width="321" height="40"/>
               </grid>
               <gridbag weightx="1.0" weighty="1.0"/>
@@ -219,7 +187,7 @@
           <grid id="b1bfc" binding="componentNameEnPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="5" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
@@ -251,7 +219,7 @@
           <grid id="717b3" binding="componentNameCnPanel" layout-manager="GridLayoutManager" row-count="1" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
             <margin top="0" left="0" bottom="0" right="0"/>
             <constraints>
-              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="6" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties>
@@ -280,7 +248,7 @@
           </grid>
           <grid id="95893" layout-manager="FlowLayout" hgap="5" vgap="5" flow-align="1">
             <constraints>
-              <grid row="8" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+              <grid row="7" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
               <gridbag weightx="0.0" weighty="0.0"/>
             </constraints>
             <properties/>

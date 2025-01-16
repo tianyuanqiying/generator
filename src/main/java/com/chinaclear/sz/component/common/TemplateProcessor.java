@@ -11,7 +11,7 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * 模板解析器
+ * freemarker模板解析器
  */
 public class TemplateProcessor {
     private String templateName;
@@ -38,21 +38,11 @@ public class TemplateProcessor {
             // 加载模板
             Template template = cfg.getTemplate(templateName, "UTF-8");
 
-            // 输出流，写入目标文件
-//            Writer writer = new StringWriter();
-
             //合并数据模型与模板， 替换模板参数
             template.process(buildTemplateParam, writer);
-            //内容
-//            String content = new String(writer.toString().getBytes(), "UTF-8");
 
             //写入文件
-//            BufferedWriter out = new BufferedWriter(new FileWriter(targetFile, Charset.forName("UTF-8")));
             out.write(writer.toString());
-
-            // 关闭输出流
-//            out.close();
-//            writer.close();
         }  catch (Exception e) {
             throw new RuntimeException(e);
         }

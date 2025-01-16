@@ -2,7 +2,7 @@ package cn.chinaclear.sz.component.${packageName}.service;
 
 import cn.chinaclear.sz.component.common.base.InterfaceParamFullFeatureService
 import cn.chinaclear.sz.component.${packageName}.model.${componentName}BO;
-import cn.chinaclear.sz.component.${packageName}.model.dto.${componentName}Param;
+import cn.chinaclear.sz.component.${packageName}.model.dto.${componentName}DTO;
 
 /**
 * <p> ${componentCnName}业务服务接口 </p>
@@ -14,6 +14,6 @@ import cn.chinaclear.sz.component.${packageName}.model.dto.${componentName}Param
 * @version 1.0.0
 * @since 1.0.0
 */
-public interface ${componentName}BusinessService extends InterfaceParamFullFeatureService<${componentName}BO,${componentName}Param> {
+public interface ${componentName}BusinessService extends InterfaceParamFullFeatureService<${componentName}BO, ${componentName}DTO> {
 
 }

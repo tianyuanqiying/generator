@@ -9,11 +9,10 @@ import cn.chinaclear.sz.bpmframework.web.client.RestDataClient;
 import cn.chinaclear.sz.component.${packageName}.dao.${componentName}BusinessMapper;
 import cn.chinaclear.sz.component.${packageName}.model.${componentName}BO;
 import cn.chinaclear.sz.component.${packageName}.model.${componentName}PO;
-import cn.chinaclear.sz.component.${packageName}.properties.FocusProperties;
+import cn.chinaclear.sz.component.${packageName}.properties.${componentName}FocusProperties;
 import cn.chinaclear.sz.component.${packageName}.service.${componentName}BusinessService;
 import cn.chinaclear.sz.component.common.base.AbstractQueryComponent;
 import cn.chinaclear.sz.component.common.service.AbstractCommonService;
-import cn.chinaclear.sz.component.common.util.BizStructureUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,7 @@ public class ${componentName}BusinessServiceImpl extends AbstractCommonService<$
     /**
      * focus接口配置类
     */
-    private final FocusProperties properties;
+    private final ${componentName}FocusProperties properties;
 
 }
 

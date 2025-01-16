@@ -7,9 +7,15 @@ plugins {
 apply plugin: 'DevLint'
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    implementation 'cn.chinaclear.sz.bpmframework:bpm-process-spring-boot-starter:${version}'
+    implementation 'cn.chinaclear.sz.bpmframework:bpm-process-spring-boot-starter'
+}
+
+DevLint {
+   workflow {
+     PbuNewOrOpen {
+      workflowDefinitionFile = file("./src/main/resources/workflow/PbuNewOrOpen.workflow")
+     }
+  }
 }
 
 description = '${subProjectName}'

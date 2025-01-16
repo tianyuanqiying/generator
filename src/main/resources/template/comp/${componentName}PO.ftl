@@ -21,11 +21,11 @@ import java.util.Date;
 * @version 1.0.0
 * @since 1.0.0
 */
-@Data
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
 @Schema(description = "${componentCnName}组件持久化实体")
 //TODO:设置表名
 @Table(name = "")

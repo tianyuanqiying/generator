@@ -7,9 +7,7 @@ plugins {
 apply plugin: 'DevLint'
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-    implementation 'cn.chinaclear.sz.bpmframework.query:query-spring-boot-starter:${version}'
+    implementation 'cn.chinaclear.sz.bpmframework.query:query-spring-boot-starter'
 }
 
 description = '${subProjectName}'

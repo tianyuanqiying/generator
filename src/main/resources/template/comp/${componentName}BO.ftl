@@ -17,7 +17,8 @@ import org.springframework.beans.BeanUtils;
 * @version 1.0.0
 * @since 1.0.0
 */
-@Data
+@Getter
+@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor

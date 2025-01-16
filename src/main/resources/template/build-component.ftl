@@ -3,9 +3,9 @@ version = '1.0.1-SNAPSHOT'
 description = '${subProjectName}'
 
 ext {
-    artifactoryBaseUrl = 'http://maven.sz.chinaclear.cn/content/repositories'
-    artifactorySnapshotRepoUrl = "$artifactoryBaseUrl/snapshots"
-    artifactoryReleaseRepoUrl = "$artifactoryBaseUrl/releases"
+    artifactoryBaseUrl = 'http://maven.sz.chinaclear.cn'
+    artifactorySnapshotRepoUrl = "$artifactoryBaseUrl/content/repositories/snapshots"
+    artifactoryReleaseRepoUrl = "$artifactoryBaseUrl/repository/maven-release"
 }
 
 publishing {

@@ -10,6 +10,9 @@ import java.util.Objects;
 import java.util.Properties;
 
 
+/**
+ * 负责解析properties文件，并返回键值对
+ */
 public final class PropertiesReader {
 
     public static Map<String, String> readConfig(String filePath) {

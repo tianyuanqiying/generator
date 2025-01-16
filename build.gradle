@@ -3,11 +3,12 @@ plugins {
     id("org.jetbrains.intellij") version "1.16.1"
 }
 
-group = "com.example"
-version = "1.0.0"
+group = "com.chinaclear.sz.tool"
+version = "1.0.2"
 
 repositories {
 
+    
     maven { url 'https://maven.aliyun.com/repository/public/' }
     maven { url 'https://maven.aliyun.com/repository/gradle-plugin'}
     maven { url 'https://maven.aliyun.com/repository/central/'}
@@ -37,18 +38,4 @@ patchPluginXml {
     //注意这个版本号不能高于上面intellij的version,否则runIde会报错
     sinceBuild = '231'
     untilBuild = '241.*'
-}
-
-task cacheToMaven(type: Copy) {
-    from new File('E:/gradle-8.4-bin/repo/')
-    into 'E:/gradle-8.4-bin/maven'
-    eachFile {
-        it.path = it.path.replace('\\', '/')
-        List<String> paths = it.path.replace('/')
-        String path = paths[0].replace('.','/')
-        paths.remove(0);
-        paths.remove(paths.size() - 2);
-        path = path + '/' + String.join('/', paths)
-        it.path = path
-    }
 }

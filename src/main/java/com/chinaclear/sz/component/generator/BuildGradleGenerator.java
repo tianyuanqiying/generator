@@ -63,10 +63,6 @@ public class BuildGradleGenerator extends AbstractReplaceProcess implements Gene
 
     @Override
     public void generate(ModuleInfo moduleInfo) {
-        if (StrUtil.isBlank(moduleInfo.getVersion())) {
-            GeneratorUtil.showErrorMessage("版本号不能为空");
-            return;
-        }
         if (StrUtil.isBlank(moduleInfo.getSubProjectName())) {
             GeneratorUtil.showErrorMessage("子项目名称为空");
             return;

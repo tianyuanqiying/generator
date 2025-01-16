@@ -1,0 +1,6 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="com.example.generator:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/com_example_generator_jar</output-path>
+    <root id="archive" name="com.example.generator.jar" />
+  </artifact>
+</component>
