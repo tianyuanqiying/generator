@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 通用实现
+ * 通用实现文件模板替换流程
  */
 public class CommonReplaceProcess extends AbstractReplaceProcess {
     String templateName;

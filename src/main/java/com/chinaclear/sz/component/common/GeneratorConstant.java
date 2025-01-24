@@ -1,5 +1,8 @@
 package com.chinaclear.sz.component.common;
 
+/**
+ * 常量类
+ */
 public class GeneratorConstant {
     public final static String JAVA_SUFFIX = ".java";
 

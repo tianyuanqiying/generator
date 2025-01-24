@@ -8,6 +8,7 @@ apply plugin: 'DevLint'
 
 dependencies {
     implementation 'cn.chinaclear.sz.bpmframework.query:query-spring-boot-starter'
+    implementation 'cn.chinaclear.sz.component:common-component:1.2.1-SNAPSHOT'
 }
 
 description = '${subProjectName}'

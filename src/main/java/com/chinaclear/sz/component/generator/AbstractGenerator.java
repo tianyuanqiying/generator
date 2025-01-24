@@ -101,7 +101,7 @@ public abstract class AbstractGenerator implements Generator, PathResolver, IPro
             FileUtil.writeLines(lines,buildGradle, CharsetUtil.CHARSET_UTF_8);
         } catch (IOException e) {
             GeneratorUtil.showErrorMessage(e.getMessage());
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
     }
 

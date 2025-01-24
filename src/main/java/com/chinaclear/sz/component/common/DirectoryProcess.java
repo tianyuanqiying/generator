@@ -7,6 +7,9 @@ import com.chinaclear.sz.component.pojo.ModuleInfo;
 
 import java.util.List;
 
+/**
+ * 目录生成流程
+ */
 public class DirectoryProcess implements IProcess, PathResolver{
     private String keyPrefix;
 

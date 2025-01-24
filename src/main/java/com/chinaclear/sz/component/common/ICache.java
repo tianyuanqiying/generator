@@ -7,9 +7,9 @@ import java.util.List;
  */
 public interface ICache {
     /**
-     * 读取缓存
+     * 初始化缓存
      */
-    void readCache();
+    void initCache();
 
     /**
      * 根据key获取配置

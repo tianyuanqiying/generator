@@ -4,7 +4,6 @@ import com.chinaclear.sz.component.common.ICache;
 import com.chinaclear.sz.component.pojo.CacheKey;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,15 +14,15 @@ public class SingleCacheRegistry {
     public static Map<String, ICache> cacheMap = new HashMap<>();
 
     static {
-        initCache();
+        loadCache();
     }
 
-    private static void initCache() {
+    private static void loadCache() {
         for (CacheKey value : CacheKey.values()) {
             try {
                 Constructor constructor = value.getCacheClazz().getConstructor();
                 ICache instance = (ICache) constructor.newInstance();
-                instance.readCache();
+                instance.initCache();
                 cacheMap.put(value.getKey(), instance);
             } catch (Exception e) {
                 throw new RuntimeException(e);

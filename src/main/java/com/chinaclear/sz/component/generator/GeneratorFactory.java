@@ -24,6 +24,8 @@ public class GeneratorFactory {
         generators.add(new ComponentFileGenerator());
         //参维应用初始代码生成器
         generators.add(new ParamFileGenerator());
+        //添加查询应用 初始代码生成器
+        generators.add(new QueryFileGenerator());
     }
 
     public static List<Generator> getGenerators() {

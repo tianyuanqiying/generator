@@ -7,6 +7,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 文件路径解析器，用来替换掉包名路径中的替换符
+ */
 public interface PathResolver {
     /**
      * 单独处理相对路径处理为绝对路径
@@ -38,7 +41,6 @@ public interface PathResolver {
             //替换掉替换符${componentName}
             path = path.replaceAll(GeneratorConstant.COMPONENT_NAME_REPLACEMENT, moduleInfo.getComponentName());
 
-            //避免开头配置不清楚，统一加上File.separator
             if (!path.startsWith(File.separator)) {
                 path = File.separator + path;
             }

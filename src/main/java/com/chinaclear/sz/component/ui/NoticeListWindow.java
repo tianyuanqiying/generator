@@ -304,12 +304,14 @@ public class NoticeListWindow {
             //选择了组件类型，隐藏 打包插件输入框和框架版本下拉框, 否则显示打包插件和框架版本下拉框
             if (ItemEvent.SELECTED == e.getStateChange()
             && (ModuleEnum.COMPONENT.getName().equals(selectedItem.toString())
-               || ModuleEnum.PARAM.getName().equals(selectedItem.toString()))
+               || ModuleEnum.PARAM.getName().equals(selectedItem.toString())
+                    || ModuleEnum.QUERY.getName().equals(selectedItem.toString()))
             ) {
                 componentNameEnPanel.setVisible(true);
                 componentNameCnPanel.setVisible(true);
                 convertPanel.setVisible(false);
-                if (ModuleEnum.PARAM.getName().equals(selectedItem.toString())) {
+                if (ModuleEnum.PARAM.getName().equals(selectedItem.toString())
+                || ModuleEnum.QUERY.getName().equals(selectedItem.toString())) {
                     convertPanel.setVisible(true);
                 }
                 return;
