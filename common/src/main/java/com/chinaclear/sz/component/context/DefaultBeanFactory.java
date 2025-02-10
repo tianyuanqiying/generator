@@ -34,19 +34,19 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
     public DefaultBeanFactory() {
         //注册解析@Configuration的配置类
         if (!containsBeanDefinition(CONFIGURATION_CLASS_POST_PROCESSOR_NAME)) {
-            BeanDefinition beanDefinition = GenericBeanDefinition.buildBeanDefinition(ConfigurationClassPostProcessor.class);
+            BeanDefinition beanDefinition = GenericBeanDefinition.buildBeanDefinition(ConfigurationClassPostProcessor.class, BeanType.SYSTEM_TYPE);
             registerBeanDefinition(beanDefinition.getBeanName(), beanDefinition);
         }
 
         //注册解析@Autowired的后置处理器
         if (!containsBeanDefinition(AUTOWIRED_ANNOTATION_BEAN_PROCESSOR_NAME)) {
-            BeanDefinition beanDefinition = GenericBeanDefinition.buildBeanDefinition(AutowiredAnnotationPostProcessor.class);
+            BeanDefinition beanDefinition = GenericBeanDefinition.buildBeanDefinition(AutowiredAnnotationPostProcessor.class, BeanType.SYSTEM_TYPE);
             registerBeanDefinition(beanDefinition.getBeanName(), beanDefinition);
         }
 
         //注册解析@Resource的后置处理器
         if (!containsBeanDefinition(COMMON_ANNOTATION_BEAN_PROCESSOR_NAME)) {
-            BeanDefinition beanDefinition = GenericBeanDefinition.buildBeanDefinition(ConfigurationClassPostProcessor.class);
+            BeanDefinition beanDefinition = GenericBeanDefinition.buildBeanDefinition(ConfigurationClassPostProcessor.class, BeanType.SYSTEM_TYPE);
             registerBeanDefinition(beanDefinition.getBeanName(), beanDefinition);
         }
     }
@@ -64,6 +64,12 @@ public class DefaultBeanFactory implements BeanFactory, BeanDefinitionRegistry {
     @Override
     public boolean containsBean(String name) {
         return singletonObjects.containsKey(name);
+    }
+
+    @Override
+    public boolean getBeanNamesByType(Class type) {
+
+        return false;
     }
 
     @Override

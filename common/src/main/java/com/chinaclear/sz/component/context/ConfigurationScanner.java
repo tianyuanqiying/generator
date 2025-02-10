@@ -1,31 +1,37 @@
 package com.chinaclear.sz.component.context;
 
 import com.chinaclear.sz.component.anno.Component;
+import com.chinaclear.sz.component.anno.Configuration;
 import com.chinaclear.sz.component.common.BeanDefinition;
 import com.chinaclear.sz.component.common.IScanner;
 import com.chinaclear.sz.component.util.ScannerUtil;
 
-import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * 扫描注解Bean
+ * 扫描带有@Configuration类 和@Bean方法
  */
-public class ClassPathScanner implements IScanner {
+public class ConfigurationScanner implements IScanner {
     private List<Class> includeTypes = new ArrayList<>();
 
-    public ClassPathScanner() {
-        includeTypes.add(Component.class);
+    public List<BeanMethod> getBeanMethods() {
+        return beanMethods;
+    }
+
+    public void setBeanMethods(List<BeanMethod> beanMethods) {
+        this.beanMethods = beanMethods;
+    }
+
+    private List<BeanMethod> beanMethods = new ArrayList<>();
+
+    public ConfigurationScanner() {
+        includeTypes.add(Configuration.class);
     }
 
     @Override
     public List<BeanDefinition> scan(String path) {
-        if (path == null) {
-            return new ArrayList<>();
-        }
-
         List<BeanDefinition> beanDefinitions = new ArrayList<>();
 
         //扫描包下的所有类
@@ -33,18 +39,25 @@ public class ClassPathScanner implements IScanner {
 
         //创建Bean信息
         for (Class clazz : allClass) {
-
             //检查条件
             if (!checkCandidate(clazz)) {
                 continue;
             }
 
-            GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-            beanDefinition.setBeanName(clazz.getSimpleName());
-            beanDefinition.setId(clazz.getSimpleName());
-            beanDefinition.setBeanClass(clazz);
-            beanDefinitions.add(beanDefinition);
+            BeanDefinition definition = GenericBeanDefinition.buildBeanDefinition(clazz, BeanType.CONFIGURATION_TYPE);
+            beanDefinitions.add(definition);
+
+            //扫描@Bean方法
+            BeanAnnoParser beanAnnoParser = new BeanAnnoParser();
+            List<Method> methods = beanAnnoParser.scan(clazz);
+            for (Method method : methods) {
+                BeanMethod beanMethod = new BeanMethod();
+                beanMethod.setConfigClazz(clazz);
+                beanMethod.setMethod(method);
+                beanMethods.add(beanMethod);
+            }
         }
+
         return beanDefinitions;
     }
 
@@ -56,7 +69,7 @@ public class ClassPathScanner implements IScanner {
     }
 
     public static void main(String[] args) {
-        ClassPathScanner classPathScanner = new ClassPathScanner();
+        ConfigurationScanner classPathScanner = new ConfigurationScanner();
         List<BeanDefinition> com = classPathScanner.scan("com.chinaclear.sz");
         System.out.println(com);
     }

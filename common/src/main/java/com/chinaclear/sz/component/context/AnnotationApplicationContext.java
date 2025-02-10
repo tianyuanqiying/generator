@@ -3,6 +3,7 @@ package com.chinaclear.sz.component.context;
 import com.chinaclear.sz.component.common.ApplicationContext;
 import com.chinaclear.sz.component.common.ApplicationEvent;
 import com.chinaclear.sz.component.common.BeanFactory;
+import com.chinaclear.sz.component.common.BeanFactoryPostProcessor;
 
 public class AnnotationApplicationContext implements ApplicationContext {
     private String basePackage;
@@ -34,6 +35,11 @@ public class AnnotationApplicationContext implements ApplicationContext {
     @Override
     public boolean containsBean(String name) {
         return beanFactory.containsBean(name);
+    }
+
+    @Override
+    public boolean getBeanNamesByType(Class type) {
+        return false;
     }
 
     @Override
@@ -78,6 +84,6 @@ public class AnnotationApplicationContext implements ApplicationContext {
     }
 
     private void invokeBeanFactoryPostProcessors(BeanFactory beanFactory) {
-
+        beanFactory.getBeanByType(BeanFactoryPostProcessor.class)
     }
 }

@@ -6,4 +6,6 @@ public interface BeanFactory {
     Object getBeanByName(String beanName);
 
     boolean containsBean(String name);
+
+    boolean getBeanNamesByType(Class type);
 }
