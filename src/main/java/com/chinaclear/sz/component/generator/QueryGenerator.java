@@ -31,6 +31,6 @@ public class QueryGenerator extends AbstractGenerator {
 
         //更新setting.gradle
         super.updateSettingGradle(moduleInfo);
-        super.updateApplicationBuildGradle(moduleInfo);
+//        super.updateApplicationBuildGradle(moduleInfo);
     }
 }

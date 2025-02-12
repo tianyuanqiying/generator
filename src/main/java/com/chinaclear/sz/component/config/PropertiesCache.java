@@ -25,17 +25,4 @@ public class PropertiesCache {
     public static String get(String key) {
         return map.get(key);
     }
-
-    public static void main(String[] args) {
-        PropertiesCache.readConfig();
-        System.out.println(PropertiesCache.map);
-        List<String> component = PathCache.getWithPrefix("component");
-        System.out.println();
-        String path = component.get(0);
-        String demo = path.replace("${packageName}", "demo").replace("${file.separator}", File.separator);
-        File file = new File(demo);
-        System.out.println(file.exists());
-        file.mkdirs();
-        System.out.println(file.exists());
-    }
 }

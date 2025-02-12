@@ -26,6 +26,10 @@ public class GeneratorFactory {
         generators.add(new ParamFileGenerator());
         //添加查询应用 初始代码生成器
         generators.add(new QueryFileGenerator());
+        //添加application模块的build.gradle文件修改器
+        generators.add(new ApplicationBuildGradleUpdater());
+        //添加application模块的application.properties文件修改器
+        generators.add(new ApplicationPropertiesUpdater());
     }
 
     public static List<Generator> getGenerators() {

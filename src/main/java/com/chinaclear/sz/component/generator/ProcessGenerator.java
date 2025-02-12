@@ -37,6 +37,6 @@ public class ProcessGenerator extends AbstractGenerator {
 
         //处理settings.gradle文件
         super.updateSettingGradle(moduleInfo);
-        super.updateApplicationBuildGradle(moduleInfo);
+//        super.updateApplicationBuildGradle(moduleInfo);
     }
 }

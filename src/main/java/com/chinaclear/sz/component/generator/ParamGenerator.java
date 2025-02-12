@@ -34,6 +34,6 @@ public class ParamGenerator extends AbstractGenerator{
 
         //更新settings.gradle文件
         super.updateSettingGradle(moduleInfo);
-        super.updateApplicationBuildGradle(moduleInfo);
+//        super.updateApplicationBuildGradle(moduleInfo);
     }
 }
