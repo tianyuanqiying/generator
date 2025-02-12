@@ -1,13 +1,12 @@
 package com.chinaclear.sz.component.context;
 
-import com.chinaclear.sz.component.common.ApplicationContext;
-import com.chinaclear.sz.component.common.ApplicationEvent;
-import com.chinaclear.sz.component.common.BeanFactory;
-import com.chinaclear.sz.component.common.BeanFactoryPostProcessor;
+import com.chinaclear.sz.component.common.*;
+
+import java.util.List;
 
 public class AnnotationApplicationContext implements ApplicationContext {
     private String basePackage;
-    private BeanFactory beanFactory;
+    private ConfigurableListableBeanFactory beanFactory;
 
     public AnnotationApplicationContext() {
     }
@@ -33,13 +32,18 @@ public class AnnotationApplicationContext implements ApplicationContext {
     }
 
     @Override
+    public <T> T getBeanByName(String beanName, Class<T> classType) {
+        return null;
+    }
+
+    @Override
     public boolean containsBean(String name) {
         return beanFactory.containsBean(name);
     }
 
     @Override
-    public boolean getBeanNamesByType(Class type) {
-        return false;
+    public List<String> getBeanNamesByType(Class type) {
+        return beanFactory.getBeanNamesByType(type);
     }
 
     @Override
@@ -57,7 +61,7 @@ public class AnnotationApplicationContext implements ApplicationContext {
         registerApplicationListener();
 
         //创建并初始化Bean
-        finishBeanFactoryInitialization();
+        finishBeanFactoryInitialization(beanFactory);
 
         //扩展
         finishRefresh();
@@ -67,8 +71,8 @@ public class AnnotationApplicationContext implements ApplicationContext {
 
     }
 
-    private void finishBeanFactoryInitialization() {
-
+    private void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
+        beanFactory.preInstantiateSingletons();
     }
 
     private void registerApplicationListener() {
@@ -84,6 +88,12 @@ public class AnnotationApplicationContext implements ApplicationContext {
     }
 
     private void invokeBeanFactoryPostProcessors(BeanFactory beanFactory) {
-        beanFactory.getBeanByType(BeanFactoryPostProcessor.class)
+        List<String> beanNames = beanFactory.getBeanNamesByType(BeanFactoryPostProcessor.class);
+        for (String beanName : beanNames) {
+            BeanFactoryPostProcessor beanFactoryPostProcessor = beanFactory.getBeanByName(beanName, BeanFactoryPostProcessor.class);
+            beanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
+        }
+
+        //扩展二次处理BeanFactoryPostProcessor
     }
 }
