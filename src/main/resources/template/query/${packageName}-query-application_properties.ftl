@@ -1,2 +1,2 @@
 spring.config.import=\
-  config/Query-${componentName}.yml
+  classpath: config/Query-${componentName}.yml

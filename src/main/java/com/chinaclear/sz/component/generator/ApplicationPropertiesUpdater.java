@@ -34,7 +34,7 @@ public class ApplicationPropertiesUpdater extends AbstractGenerator {
         String applicationPropertiesFilePath = SingleCacheRegistry.getCache(CacheKey.PATH).get("backend_main_application_properties_path");
         String realApplicationPropertiesFilePath = super.handlePath(applicationPropertiesFilePath, moduleInfo);
         String insertLabel = "spring.config.import";
-        String insertInfo = "   optional:classpath:/" + moduleInfo.getPackageName() + "-query-application.properties,\\";
+        String insertInfo = "  optional:classpath:/" + moduleInfo.getPackageName() + "-query-application.properties,\\";
         //更新application.properties文件的insertLabel标签的下一行插入内容insertInfo
         super.insertFileInfo(insertLabel, insertInfo, realApplicationPropertiesFilePath);
 
