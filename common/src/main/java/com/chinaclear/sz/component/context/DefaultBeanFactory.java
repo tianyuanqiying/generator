@@ -91,6 +91,11 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
     }
 
     @Override
+    public Object getBean(String beanName) {
+        return getBean(beanName, null);
+    }
+
+    @Override
     public void registerBeanDefinition(String beanName, BeanDefinition beanDefinition) {
         if (!containsBean(beanName)) {
             beanDefinitionMap.put(beanName, beanDefinition);
@@ -135,28 +140,87 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
 
     @Override
     public Object getSingleton(String beanName, boolean allowEarlyReference) {
-        return null;
+        return singletonObjects.get(beanName);
     }
 
     public <T> T getBean(String beanName, Class<T> requireType) {
-        //Bean的生命周期
-        //1. 实例化前；
-        //2. 实例化Bean
-        //3. 实例化后
-        // 循环依赖下的AOP动态代理
-        //4. 自动注入
-        // 处理Aware回调
-        //5. 初始化前
-        //6. 初始化
-        //7. 初始化后
-        //8. 所有单例Bean创建结束
         Object singleton = getSingleton(beanName);
-        if (singleton != null) {
+        if (singleton == null) {
+            //实例化前
+            singleton = applyPostProcessBeforeInstantiation(beanName);
 
-        } else {
-            
+            if (singleton != null) {
+                return adaptBeanInstance(beanName, singleton, requireType);
+            }
+
+            //实例化
+            singleton = createBeanInstance(beanName);
+
+            //实例化后
+            applyPostProcessAfterInstantiation(beanName, singleton);
+
+            //自动注入
+            populateBean(beanName, singleton);
+
+            //初始化前
+            applyPostProcessBeforeInitialization(beanName);
+            //初始化
+            initializationBean(beanName);
+            //初始化后
+            applyPostProcessAfterInitialization(beanName);
         }
+
         return adaptBeanInstance(beanName, singleton, requireType);
+    }
+
+    private void applyPostProcessAfterInitialization(String beanName) {
+
+    }
+
+    private void initializationBean(String beanName) {
+
+    }
+
+    private void applyPostProcessBeforeInitialization(String beanName) {
+
+    }
+
+    private void populateBean(String beanName, Object singleton) {
+
+    }
+
+    private Object createBeanInstance(String beanName) {
+        //1. Spring可以通过Supplier获取Bean
+
+        //2. 判断是否为@bean类型；
+        BeanDefinition definition = getBeanDefinition(beanName);
+        if (BeanType.BEAN_METHOD_TYPE == definition.getBeanType()) {
+
+        }
+
+        //3. Spring会进行推断构造方法，这里直接使用无参构造方法；
+
+        return null;
+    }
+
+    private Object applyPostProcessAfterInstantiation(String beanName, Object singleton) {
+        return singleton;
+    }
+
+    private Object applyPostProcessBeforeInstantiation(String beanName) {
+        BeanDefinition definition = getBeanDefinition(beanName);
+        List<String> postProcessorBeanNames = getBeanNamesByType(InstantiationAwareBeanPostProcessor.class);
+        for (String processorBeanName : postProcessorBeanNames) {
+            InstantiationAwareBeanPostProcessor postProcessor = getBeanByName(processorBeanName, InstantiationAwareBeanPostProcessor.class);
+            if (postProcessor.isSupport(beanName)) {
+                Object singleton = postProcessor.postProcessBeforeInstantiation(definition.getClass(), beanName);
+                if (singleton != null) {
+                    singleton = applyPostProcessAfterInstantiation(beanName, singleton);
+                    return singleton;
+                }
+            }
+        }
+        return null;
     }
 
     private <T> T adaptBeanInstance(String beanName, Object singleton, Class<T> requireType) {

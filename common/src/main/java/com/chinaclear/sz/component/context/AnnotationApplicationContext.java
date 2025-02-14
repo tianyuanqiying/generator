@@ -47,6 +47,11 @@ public class AnnotationApplicationContext implements ApplicationContext {
     }
 
     @Override
+    public Object getBean(String beanName) {
+        return beanFactory.getBean(beanName);
+    }
+
+    @Override
     public void refresh() {
         //完成Bean的扫描
         invokeBeanFactoryPostProcessors(beanFactory);

@@ -2,10 +2,11 @@ package com.chinaclear.sz.component.context;
 
 import java.lang.reflect.Method;
 
-public class BeanMethodBeanDefinition extends AbstractBeanDefinition{
+public class BeanMethodBeanDefinition extends AbstractBeanDefinition {
     private String methodName;
     private Method beanMethod;
     private Class configClass;
+    private String factoryMethodName;
 
     public static BeanMethodBeanDefinition buildBeanDefinition(BeanMethod beanMethod) {
         BeanMethodBeanDefinition beanMethodBeanDefinition = new BeanMethodBeanDefinition();
