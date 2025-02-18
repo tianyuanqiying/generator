@@ -1,7 +1,9 @@
 package com.chinaclear.sz.component.context;
 
+import cn.hutool.core.bean.BeanUtil;
 import com.chinaclear.sz.component.common.*;
 
+import java.lang.reflect.Constructor;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -144,6 +146,7 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
     }
 
     public <T> T getBean(String beanName, Class<T> requireType) {
+        RootBeanDefinition rootBeanDefinition = mergeBeanDefinition(beanName, requireType);
         Object singleton = getSingleton(beanName);
         if (singleton == null) {
             //实例化前
@@ -154,7 +157,7 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
             }
 
             //实例化
-            singleton = createBeanInstance(beanName);
+            singleton = createBeanInstance(beanName, rootBeanDefinition);
 
             //实例化后
             applyPostProcessAfterInstantiation(beanName, singleton);
@@ -163,47 +166,95 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
             populateBean(beanName, singleton);
 
             //初始化前
-            applyPostProcessBeforeInitialization(beanName);
+            applyPostProcessBeforeInitialization(beanName, singleton);
             //初始化
-            initializationBean(beanName);
+            initializationBean(beanName, singleton);
             //初始化后
-            applyPostProcessAfterInitialization(beanName);
+            applyPostProcessAfterInitialization(beanName, singleton);
         }
 
         return adaptBeanInstance(beanName, singleton, requireType);
     }
 
-    private void applyPostProcessAfterInitialization(String beanName) {
+    private RootBeanDefinition mergeBeanDefinition(String beanName) {
+        BeanDefinition definition = this.getBeanDefinition(beanName);
+        RootBeanDefinition rootBeanDefinition = BeanUtil.copyProperties(definition, RootBeanDefinition.class);
+        return rootBeanDefinition;
+    }
+
+    private void applyPostProcessAfterInitialization(String beanName, Object singleton) {
+        List<String> beanNamesByType = getBeanNamesByType(BeanPostProcessor.class);
+        for (String postProcessorBeanName : beanNamesByType) {
+            InstantiationAwareBeanPostProcessor postProcessor = getBeanByName(postProcessorBeanName, InstantiationAwareBeanPostProcessor.class);
+            if (postProcessor.isSupport(singleton)) {
+                postProcessor.postProcessBeforeBeanInitialization(singleton);
+            }
+        }
+    }
+
+    private void initializationBean(String beanName, Object singleton) {
 
     }
 
-    private void initializationBean(String beanName) {
-
-    }
-
-    private void applyPostProcessBeforeInitialization(String beanName) {
-
+    private void applyPostProcessBeforeInitialization(String beanName, Object singleton) {
+        List<String> beanNamesByType = getBeanNamesByType(BeanPostProcessor.class);
+        for (String postProcessorBeanName : beanNamesByType) {
+            InstantiationAwareBeanPostProcessor postProcessor = getBeanByName(postProcessorBeanName, InstantiationAwareBeanPostProcessor.class);
+            if (postProcessor.isSupport(singleton)) {
+                postProcessor.postProcessBeforeBeanInitialization(singleton);
+            }
+        }
     }
 
     private void populateBean(String beanName, Object singleton) {
-
+        List<String> beanNamesByType = getBeanNamesByType(InstantiationAwareBeanPostProcessor.class);
+        for (String postProcessorBeanName : beanNamesByType) {
+            InstantiationAwareBeanPostProcessor postProcessor = getBeanByName(postProcessorBeanName, InstantiationAwareBeanPostProcessor.class);
+            if (postProcessor.isSupport(singleton)) {
+                postProcessor.postProcessProperties(null, singleton, beanName);
+            }
+        }
     }
 
-    private Object createBeanInstance(String beanName) {
+    private Object createBeanInstance(String beanName, RootBeanDefinition rootBeanDefinition) {
         //1. Spring可以通过Supplier获取Bean
 
         //2. 判断是否为@bean类型；
-        BeanDefinition definition = getBeanDefinition(beanName);
-        if (BeanType.BEAN_METHOD_TYPE == definition.getBeanType()) {
-
+        if (rootBeanDefinition.getFactoryMethodName() != null) {
+            rootBeanDefinition.getBeanMethod().setAccessible(true);
+            //拿到Method方法所属的配置类的Bean
+            Object configBean = getBeanByType(rootBeanDefinition.getConfigClass());
+            try {
+                Object object = rootBeanDefinition.getBeanMethod().invoke(configBean);
+                return object;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
+
         //3. Spring会进行推断构造方法，这里直接使用无参构造方法；
+        if (rootBeanDefinition.getBeanClass() != null) {
+            try {
+                Constructor constructor = rootBeanDefinition.getBeanClass().getConstructor();
+                Object newInstance = constructor.newInstance();
+                return newInstance;
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
 
         return null;
     }
 
     private Object applyPostProcessAfterInstantiation(String beanName, Object singleton) {
+        List<String> beanNamesByType = getBeanNamesByType(InstantiationAwareBeanPostProcessor.class);
+        for (String postProcessorBeanName : beanNamesByType) {
+            InstantiationAwareBeanPostProcessor postProcessor = getBeanByName(postProcessorBeanName, InstantiationAwareBeanPostProcessor.class);
+            if (postProcessor.isSupport(singleton)) {
+                postProcessor.postProcessAfterInstantiation(singleton, beanName);
+            }
+        }
         return singleton;
     }
 

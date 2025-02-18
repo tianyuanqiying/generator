@@ -16,6 +16,7 @@ public class BeanMethodBeanDefinition extends AbstractBeanDefinition {
         beanMethodBeanDefinition.setBeanName(beanMethod.getMethod().getName());
         beanMethodBeanDefinition.setBeanType(BeanType.BEAN_METHOD_TYPE);
         beanMethodBeanDefinition.configClass = beanMethod.getConfigClazz();
+        beanMethodBeanDefinition.factoryMethodName = beanMethod.getMethod().getName();
         return beanMethodBeanDefinition;
     }
 }
