@@ -1,6 +1,7 @@
 package com.chinaclear.sz.component.ui;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONUtil;
@@ -44,6 +45,7 @@ public class NoticeListWindow {
     private JPanel componentNameEnPanel;
     private JTextField componentNameCnField;
     private JPanel componentNameCnPanel;
+    private JPanel packageNamePanel;
 
     private Project project;
     private ToolWindow toolWindow;
@@ -89,67 +91,7 @@ public class NoticeListWindow {
         menusType.addItemListener(new MenuTypeSelectedListener());
     }
 
-    /**
-     * 根据不同的应用类型查询不同的依赖框架版本
-     *
-     * @param menuType 应用类型
-     * @return 版本列表
-     */
-    private List<String> queryVersionList(String menuType) {
-        try {
-            //根据应用类型发送不同的URL请求
-            StringBuilder queryUrlBuilder = new StringBuilder();
-            queryUrlBuilder.append("http://maven.sz.chinaclear.cn/service/rest/v1/search?");
-            if (ModuleEnum.PROCESS.getName().equals(menuType)) {
-                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework&name=bpm-process-spring-boot-starter");
-            } else if (ModuleEnum.PARAM.getName().equals(menuType)) {
-                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework.param&name=param-maintain-spring-boot-starter");
-            } else if (ModuleEnum.QUERY.getName().equals(menuType)) {
-                queryUrlBuilder.append("group=cn.chinaclear.sz.bpmframework.query&name=query-spring-boot-starter");
-            }
 
-            cn.hutool.http.HttpRequest get = HttpUtil.createGet(queryUrlBuilder.toString());
-            //用户身份认证表示
-            get.header("Authorization", getAuthorization());
-
-            String response = get.execute().body();
-
-            //发HTTP请求
-            Map<String, Object> responseMap = JSONUtil.toBean(response, HashMap.class);
-
-            //解析items字段，拿到version列表信息
-            List<Map<String, Object>> items = Optional.ofNullable(responseMap.get("items")).map(p -> (List) p).orElse(new ArrayList());
-            //解析结果，拿到版本列表；
-            List<String> versionList = items.stream().map(item -> {
-                String repository = Optional.ofNullable(item.get("repository")).map(repo -> repo.toString()).orElse("");
-                String version = Optional.ofNullable(item.get("version")).map(v -> v.toString()).orElse("").split("-")[0];
-                if (repository.equals("snapshots")) {
-                    version = version + "-SNAPSHOT";
-                }
-                return version;
-            }).sorted((v1, v2) -> {
-                String version = v1.split("-")[0];
-                String version2 = v2.split("-")[0];
-                return version2.compareTo(version);
-            }).limit(5).distinct().toList();
-            return versionList;
-        } catch (Exception exception) {
-            System.out.println("发生异常：" + exception.getMessage());
-            return new ArrayList<>();
-        }
-    }
-
-    private String getAuthorization() {
-        //先从环境变量获取 maven库的身份信息
-        String authorization = System.getenv(GeneratorConstant.AUTHORIZATION);
-        if (StrUtil.isNotBlank(authorization)) {
-            return authorization;
-        }
-
-        //环境变量没有，则从path.properties文件里获取。
-        authorization = SingleCacheRegistry.getCache(CacheKey.CONFIG).get(GeneratorConstant.AUTHORIZATION);
-        return authorization;
-    }
 
     public JTextField getAuthorField() {
         return authorField;
@@ -172,11 +114,6 @@ public class NoticeListWindow {
             return;
         }
         String packageName = this.getPackageName().getText();
-        if (StrUtil.isBlankIfStr(packageName)) {
-            Messages.showErrorDialog("包名不能为空", "错误提示");
-            return;
-        }
-
         Object menuTypeSelected = this.getMenusType().getSelectedItem();
         if (Objects.isNull(menuTypeSelected)) {
             Messages.showErrorDialog("菜单类型不能为空", "错误提示");
@@ -188,13 +125,17 @@ public class NoticeListWindow {
             Messages.showErrorDialog("开发人员的OA名称不能为空", "错误提示");
             return;
         }
-
-
         //组件不存在转换ID
         String convertId = Optional.ofNullable(this.getConvertId().getText()).orElse("");
-
         String componentName = Optional.ofNullable(componentNameEnField.getText()).orElse("");
         String componentCnName = Optional.ofNullable(componentNameCnField.getText()).orElse("");
+
+        //如果是查询理性， 则 子项目名的全小写为包名， 大驼峰为类名前缀
+        if (ModuleEnum.QUERY.getName().equals(menuTypeSelected.toString())) {
+            packageName = subProjectName.toLowerCase();
+            componentName = Character.toUpperCase(subProjectName.charAt(0)) + subProjectName.substring(1);
+        }
+
         //创建目录生成器
         DirectoryGenerator generator = DirectoryGenerator.builder()
                 .subProjectName(subProjectName)
@@ -301,24 +242,48 @@ public class NoticeListWindow {
         @Override
         public void itemStateChanged(ItemEvent e) {
             Object selectedItem = menusType.getSelectedItem();
-            //选择了组件类型，隐藏 打包插件输入框和框架版本下拉框, 否则显示打包插件和框架版本下拉框
-            if (ItemEvent.SELECTED == e.getStateChange()
-            && (ModuleEnum.COMPONENT.getName().equals(selectedItem.toString())
-               || ModuleEnum.PARAM.getName().equals(selectedItem.toString())
-                    || ModuleEnum.QUERY.getName().equals(selectedItem.toString()))
-            ) {
-                componentNameEnPanel.setVisible(true);
+
+            //如果是查询
+            if (ItemEvent.SELECTED == e.getStateChange() && ModuleEnum.QUERY.getName().equals(selectedItem.toString())) {
+                //包名不显示
+                packageNamePanel.setVisible(false);
+                //类名前缀不显示
+                componentNameEnPanel.setVisible(false);
+                //组件中文名称显示
                 componentNameCnPanel.setVisible(true);
+                //convertId显示
+                convertPanel.setVisible(true);
+                return;
+            }
+
+            if (ItemEvent.SELECTED == e.getStateChange() && ModuleEnum.PARAM.getName().equals(selectedItem.toString())) {
+                //包名不显示
+                packageNamePanel.setVisible(true);
+                //类名前缀显示
+                componentNameEnPanel.setVisible(true);
+                //组件中文名称显示
+                componentNameCnPanel.setVisible(true);
+                //convertId显示
+                convertPanel.setVisible(true);
+                return;
+            }
+
+            if (ItemEvent.SELECTED == e.getStateChange() && ModuleEnum.COMPONENT.getName().equals(selectedItem.toString())) {
+                //包名不显示
+                packageNamePanel.setVisible(true);
+                //类名前缀显示
+                componentNameEnPanel.setVisible(true);
+                //组件中文名称显示
+                componentNameCnPanel.setVisible(true);
+                //convertId不显示
                 convertPanel.setVisible(false);
-                if (ModuleEnum.PARAM.getName().equals(selectedItem.toString())
-                || ModuleEnum.QUERY.getName().equals(selectedItem.toString())) {
-                    convertPanel.setVisible(true);
-                }
                 return;
             }
 
             //如果menutype下拉框选择了其他类型的应用
-            if (ItemEvent.SELECTED == e.getStateChange()) {
+            if (ItemEvent.SELECTED == e.getStateChange() && ModuleEnum.PROCESS.getName().equals(selectedItem.toString())) {
+                //包名不显示
+                packageNamePanel.setVisible(true);
                 //显示 版本号下拉框， 打包插件输入框， 不显示类名前缀输入框。
                 convertPanel.setVisible(true);
                 componentNameEnPanel.setVisible(false);

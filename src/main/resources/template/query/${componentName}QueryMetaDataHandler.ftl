@@ -1,9 +1,8 @@
-package cn.chinaclear.sz.app.query.${packageName}.handler;
+package cn.chinaclear.sz.app.query.${packageName}..service.impl;
 
 import cn.chinaclear.sz.app.query.${packageName}.constant.${componentName}Constant;
 import cn.chinaclear.sz.bpmframework.query.service.instance.handler.QueryMetaDataHandler;
 import cn.chinaclear.sz.component.common.enums.SchemaMetaDataKey;
-import cn.chinaclear.sz.component.common.util.JsonSchemaUtils;
 import org.springframework.stereotype.Component;
 import lombok.RequiredArgsConstructor;
 import java.util.Map;
@@ -21,8 +20,10 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class ${componentName}QueryMetaDataHandler implements QueryMetaDataHandler {
+    private final ${componentName}Service service;
+
     @Override
     public Map<String, Object> getFieldMetaData() {
-        return JsonSchemaUtils.getFieldMetaData(${componentName}Constant.JSON_SCHEMA_PATH, SchemaMetaDataKey.QUERY);
+        return service.getQueryFieldMetaData(${componentName}Constant.JSON_SCHEMA_PATH);
     }
 }

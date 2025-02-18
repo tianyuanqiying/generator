@@ -1,4 +1,4 @@
-package cn.chinaclear.sz.app.query.${packageName}.handler;
+package cn.chinaclear.sz.app.query.${packageName}.service.impl;
 
 import cn.chinaclear.sz.app.query.${packageName}.model.${componentName}Detail;
 import cn.chinaclear.sz.app.query.${packageName}.service.${componentName}Service;
