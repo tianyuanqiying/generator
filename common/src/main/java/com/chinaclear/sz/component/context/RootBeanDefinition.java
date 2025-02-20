@@ -1,6 +1,7 @@
 package com.chinaclear.sz.component.context;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 public class RootBeanDefinition {
     protected String id;
@@ -11,6 +12,15 @@ public class RootBeanDefinition {
     private Method beanMethod;
     private Class configClass;
     private String factoryMethodName;
+    private List<String> initMethods;
+
+    public List<String> getInitMethods() {
+        return initMethods;
+    }
+
+    public void setInitMethods(List<String> initMethods) {
+        this.initMethods = initMethods;
+    }
 
     public String getId() {
         return id;

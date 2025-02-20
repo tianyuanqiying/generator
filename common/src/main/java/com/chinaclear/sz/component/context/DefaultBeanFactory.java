@@ -1,9 +1,12 @@
 package com.chinaclear.sz.component.context;
 
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ReflectUtil;
 import com.chinaclear.sz.component.common.*;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -146,7 +149,7 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
     }
 
     public <T> T getBean(String beanName, Class<T> requireType) {
-        RootBeanDefinition rootBeanDefinition = mergeBeanDefinition(beanName, requireType);
+        RootBeanDefinition rootBeanDefinition = mergeBeanDefinition(beanName);
         Object singleton = getSingleton(beanName);
         if (singleton == null) {
             //实例化前
@@ -168,7 +171,7 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
             //初始化前
             applyPostProcessBeforeInitialization(beanName, singleton);
             //初始化
-            initializationBean(beanName, singleton);
+            initializationBean(beanName, singleton, rootBeanDefinition);
             //初始化后
             applyPostProcessAfterInitialization(beanName, singleton);
         }
@@ -192,8 +195,24 @@ public class DefaultBeanFactory implements ConfigurableListableBeanFactory, Bean
         }
     }
 
-    private void initializationBean(String beanName, Object singleton) {
+    private void initializationBean(String beanName, Object singleton, RootBeanDefinition rootBeanDefinition) {
+        boolean isInit = singleton instanceof InitializingBean;
+        if (isInit) {
+            ((InitializingBean)singleton).afterPropertiesSet();
+        }
 
+        //对于xml方式，需要支持init-method属性对应方法的调用；
+        if (CollectionUtil.isNotEmpty(rootBeanDefinition.getInitMethods())) {
+            List<String> initMethods = rootBeanDefinition.getInitMethods();
+            for (String initMethod : initMethods) {
+                if (!(isInit && initMethod.equals("afterPropertiesSet"))) {
+                    Class<?> beanClazz = singleton.getClass();
+                    Method method = ReflectUtil.getMethod(beanClazz, initMethod);
+                    ReflectUtil.setAccessible(method);
+                    ReflectUtil.invoke(singleton, method);
+                }
+            }
+        }
     }
 
     private void applyPostProcessBeforeInitialization(String beanName, Object singleton) {

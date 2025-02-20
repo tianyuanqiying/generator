@@ -2,14 +2,24 @@ package com.chinaclear.sz.component.context;
 
 import com.chinaclear.sz.component.common.BeanDefinition;
 
+import java.util.List;
+
 public class AbstractBeanDefinition implements BeanDefinition {
     protected String id;
     protected Class beanClass;
     protected String beanName;
     protected BeanType beanType;
-
+    private List<String> initMethods;
     public String getId() {
         return id;
+    }
+
+    public List<String> getInitMethods() {
+        return initMethods;
+    }
+
+    public void setInitMethods(List<String> initMethods) {
+        this.initMethods = initMethods;
     }
 
     public BeanType getBeanType() {

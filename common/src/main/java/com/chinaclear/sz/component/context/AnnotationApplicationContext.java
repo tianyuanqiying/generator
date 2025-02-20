@@ -1,12 +1,17 @@
 package com.chinaclear.sz.component.context;
 
 import com.chinaclear.sz.component.common.*;
+import com.chinaclear.sz.component.common.ApplicationContext;
+import com.chinaclear.sz.component.common.event.ApplicationEvent;
+import com.chinaclear.sz.component.common.event.ContextRefreshedEvent;
 
 import java.util.List;
 
 public class AnnotationApplicationContext implements ApplicationContext {
     private String basePackage;
     private ConfigurableListableBeanFactory beanFactory;
+
+    private DefaultLifeCycleProcessor defaultLifeCycleProcessor;
 
     public AnnotationApplicationContext() {
     }
@@ -73,7 +78,15 @@ public class AnnotationApplicationContext implements ApplicationContext {
     }
 
     private void finishRefresh() {
+        //调用LifeCycle回调；
+        if (defaultLifeCycleProcessor == null) {
+            defaultLifeCycleProcessor = new DefaultLifeCycleProcessor();
+        }
 
+        defaultLifeCycleProcessor.onRefresh();
+
+        //发布容器刷新完毕事件；
+        publishEvent(new ContextRefreshedEvent(this));
     }
 
     private void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
