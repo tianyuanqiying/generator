@@ -24,6 +24,24 @@ public class ${componentName}QueryValidation implements QueryValidation {
 
     @Override
     public Map<String, Object> validateQueryCondition(Map<String, Object> queryParams) {
-        return new HashMap<>();
+        //jsonschema校验
+        JsonSchemaValidator validator = JsonSchemaValidator.builder().build();
+        Map<String, Object> errorData = validator.validateForQuery(queryParams, ${componentName}Constant.JSON_SCHEMA_PATH);
+
+        //自定义校验
+        validateQueryConditionCustom(queryParams, errorData);
+        return errorData;
+    }
+
+    /**
+     * <p>查询条件自定义校验</p>
+     * <p>=====START=====</p>
+     * <p>参数校验逻辑</p>
+     * <p>=====END=======</p>
+     * @param queryParams 查询参数
+     * @param errorData 错误原因
+     */
+    private void validateQueryConditionCustom(Map<String, Object> queryParams, Map<string, Object> errorData) {
+        
     }
 }

@@ -30,6 +30,7 @@ public class ${componentName}QueryHandler implements QueryHandler<${componentNam
         QueryResult<${componentName}Detail> queryResult = service.queryData(queryCondition);
         ExecutorResult<${componentName}Detail> result = new ExecutorResult<>();
         result.setDataList(queryResult.getResult());
+        result.setSummaryData(queryResult.getSummary());
         result.setPageCond(queryResult.getPageCond());
         return result;
     }

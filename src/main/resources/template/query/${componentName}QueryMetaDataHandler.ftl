@@ -1,4 +1,4 @@
-package cn.chinaclear.sz.app.query.${packageName}..service.impl;
+package cn.chinaclear.sz.app.query.${packageName}.service.impl;
 
 import cn.chinaclear.sz.app.query.${packageName}.constant.${componentName}Constant;
 import cn.chinaclear.sz.bpmframework.query.service.instance.handler.QueryMetaDataHandler;
